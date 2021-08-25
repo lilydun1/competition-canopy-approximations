@@ -1,0 +1,4 @@
+"0","```r
+replacePAR(\"confile.dat\", \"itargets\", \"treescon\", newval = 100)
+replacePAR(\"trees.dat\", \"notrees\", \"plot\", newval=306)
+```"

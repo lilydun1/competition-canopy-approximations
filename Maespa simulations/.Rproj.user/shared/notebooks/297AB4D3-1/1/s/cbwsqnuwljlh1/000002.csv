@@ -1,0 +1,4 @@
+"0","```r
+dayflx <- readdayflux(filename = \"Dayflx.dat\")
+hrflux <- readhrflux(filename = \"hrflux.dat\")
+```"

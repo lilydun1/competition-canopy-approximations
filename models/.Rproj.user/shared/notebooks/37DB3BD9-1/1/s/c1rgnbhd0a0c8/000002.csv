@@ -1,0 +1,16 @@
+"0","```r
+CWfun <- function(shape=c(\"BOX\",\"CONE\",\"PARA\",\"ELIP\",\"CYL\"), 
+                  SA, CWCL){
+  
+  shape <- match.arg(shape)
+  cw <- switch(shape,
+               BOX = CW.box(SA, CWCL),
+               CONE = CW.cone(SA, CWCL),
+               PARA = CW.paraboloid(SA, CWCL),
+               ELIP = CW.ellipsoid(SA, CWCL),
+               CYL = CW.cyl(SA, CWCL)
+  )
+  
+  return(cw)  
+}
+```"

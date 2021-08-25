@@ -1,0 +1,51 @@
+{
+    "debugBreakpointsState": {
+        "breakpoints": [
+            {
+                "id": 2,
+                "path": "~/Documents/Maespa simulations/Simulations/A15V0_50L5_5S1_00/A15V0_50L5_5S1_00.R",
+                "line_number": 11,
+                "function_steps": "",
+                "function_name": "toplevel",
+                "state": 1,
+                "editor_state": 1,
+                "editor_line_number": 11,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": true,
+                "type": 1,
+                "is_package_breakpoint": false,
+                "package_name": ""
+            },
+            {
+                "id": 3,
+                "path": "~/Documents/Maespa simulations/R/Function.R",
+                "line_number": 47,
+                "function_steps": "",
+                "function_name": "create_trees",
+                "state": 2,
+                "editor_state": 2,
+                "editor_line_number": 47,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": true,
+                "type": 0,
+                "is_package_breakpoint": false,
+                "package_name": ""
+            },
+            {
+                "id": 6,
+                "path": "~/Documents/Maespa simulations/R/Function.R",
+                "line_number": 9,
+                "function_steps": "",
+                "function_name": "toplevel",
+                "state": 1,
+                "editor_state": 1,
+                "editor_line_number": 9,
+                "is_pending_debug_completion": false,
+                "needs_updated_steps": false,
+                "type": 1,
+                "is_package_breakpoint": false,
+                "package_name": ""
+            }
+        ]
+    }
+}

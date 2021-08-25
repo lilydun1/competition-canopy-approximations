@@ -1,0 +1,8 @@
+"0","```r
+hrflux %>% 
+  filter(Tree == \"100\") %>%
+  ggplot(aes(HOUR, hrPs)) + 
+  geom_point(aes(colour = as.factor(DOY))) + 
+  geom_line(aes(colour = as.factor(DOY))) + 
+    labs(y= \"Photosynthesis (umol tree-1 s-1)\")
+```"

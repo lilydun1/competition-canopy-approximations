@@ -1,0 +1,6 @@
+"0","```r
+met51 <- met %>% 
+  filter(DATE == \"51\") %>% 
+  mutate(HOUR = c(1:24)) %>% 
+  select(HOUR, TAIR, RHperc, PPT, WIND, RAD, PRESS, PAR)
+```"

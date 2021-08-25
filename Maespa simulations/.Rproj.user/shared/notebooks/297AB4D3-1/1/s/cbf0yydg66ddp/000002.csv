@@ -1,0 +1,21 @@
+"0","```r
+randomstand(LAI = 0.475, height = 11.64, cwcl = 0.8, ALAC = 0.5, stocking = 100, 
+    edge = 25, plotsize = c(50, 50), dbh = 0.3, crownshape = c(\"ELIP\", 
+        \"BOX\", \"CONE\", \"PARA\", \"CYL\"), path = \"\", maxnotrees = 25)
+
+```"
+"1","$cl
+[1] 6.353979
+
+$cw
+[1] 5.083183
+
+$AC
+[1] 95
+
+$hcb
+[1] 5.286021
+
+$LAtree
+[1] 47.5
+"
