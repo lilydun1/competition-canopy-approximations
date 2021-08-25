@@ -1,7 +1,6 @@
 library(Maeswrap)
 library(tidyverse)
 
-
 H <- c(15)
 V <- c(0.00, 0.10, 0.25, 0.50)
 L <- c(0.466, 1.488, 2.916, 4.402, 5.485)
@@ -43,7 +42,7 @@ results <- combinations$path[1:nrow(combinations)] %>%
 names(results) <- combinations$path[1:nrow(combinations)] %>% 
   basename()
 
-model_simp <- function(data) {
+model_simp_f <- function(data) {
   df <- data %>% 
     mutate(t_h = htcrown + httrunk) %>% 
     arrange(desc(t_h)) %>% 
@@ -58,24 +57,46 @@ model_simp <- function(data) {
       light_ppa = exp(-0.5*lai_ppa))
 }
 
-plotting <- function(d) {
-  df <- 
-    bind_rows(d, d %>% mutate(t_h = lead(t_h), new = "new")) %>% 
-    arrange(desc(t_h)) %>%
-    replace_na(list(new = "og"))
-  df_n_foc <- df %>% 
+model_simp_nf <- function(data) {
+  df <- data %>% 
+    mutate(t_h = htcrown + httrunk) %>% 
+    arrange(desc(t_h)) %>% 
+    group_by(t_h, focal) %>% 
+    summarise(larea = sum(larea)) %>% 
+    ungroup() %>% 
+    arrange(desc(t_h)) %>% 
+    mutate(
+      lai = cumsum(larea)/10204, 
+      light_ft = exp(-0.5*lai),
+      lai_ppa = floor(lai),
+      light_ppa = exp(-0.5*lai_ppa)) %>% 
     filter(focal == "FALSE")
-  df_foc <- df %>% 
-    filter(focal == "TRUE", new == "og") 
-  ggplot(data = df_n_foc, aes(t_h, light_ft)) +
-    geom_line(colour='green') +
-    geom_line(aes(t_h, light_ppa), colour='blue') +
-    geom_point(data = df_foc, aes(t_h, light_ft), colour='red') +
-    geom_point(data = df_foc, aes(t_h, light_ppa), colour='orange')
 }
 
-data <- model_simp(results[["H15_V0.1_L5.485_F1.99_S2"]])
+plotting <- function(d_nf, d_f) {
+  df_nf <- 
+    bind_rows(d_nf, d_nf %>% mutate(t_h = lead(t_h), new = "new")) %>% 
+    arrange(desc(t_h)) %>%
+    replace_na(list(new = "og"))
+  df_f <- 
+    bind_rows(d_f, d_f %>% mutate(t_h = lead(t_h), new = "new")) %>% 
+    arrange(desc(t_h)) %>%
+    replace_na(list(new = "og")) %>% 
+    filter(focal == "TRUE", new == "og")
+  ggplot(data = df_nf, aes(t_h, light_ft)) +
+    geom_line(colour='green') +
+    geom_line(aes(t_h, light_ppa), colour='blue') +
+    geom_point(data = df_f, aes(t_h, light_ft), colour='red') +
+    geom_point(data = df_f, aes(t_h, light_ppa), colour='orange')
+}
 
-plotting(d = data)
+data_f <- model_simp_f(results[["H15_V0.5_L1.488_F1.99_S2"]])
+data_nf <- model_simp_nf(results[["H15_V0.5_L1.488_F1.99_S2"]])
 
-#light interception/ 
+plotting(data_nf, data_f)
+
+#light interception
+
+
+
+

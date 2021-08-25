@@ -78,7 +78,6 @@ create_trees <- function(path, h_mn = 10, h_cv = 0.1, LAI = 1.54, ft_h = 1.99,
   replacePAR("Trees.dat", "values", "indivlarea", newval = perimeter_la)
 }
 
-
 create_simulation <- function(path = "simulations/Trail", template = "template_D",...) {
   unlink(path, recursive = T)
   dir.create(path, showWarnings = F, recursive = T)
