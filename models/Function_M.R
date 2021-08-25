@@ -43,12 +43,11 @@ results <- combinations$path[1:nrow(combinations)] %>%
 names(results) <- combinations$path[1:nrow(combinations)] %>% 
   basename()
 
-#need to add focal column here 
 model_simp <- function(data) {
-  df <- results[["H15_V0_L2.916_F1.99_S1"]] %>% 
+  df <- data %>% 
     mutate(t_h = htcrown + httrunk) %>% 
     arrange(desc(t_h)) %>% 
-    group_by(t_h) %>% 
+    group_by(t_h, focal) %>% 
     summarise(larea = sum(larea)) %>% 
     ungroup() %>% 
     arrange(desc(t_h)) %>% 
@@ -59,31 +58,24 @@ model_simp <- function(data) {
       light_ppa = exp(-0.5*lai_ppa))
 }
 
-plotting <- function(d, foc) {
+plotting <- function(d) {
   df <- 
     bind_rows(d, d %>% mutate(t_h = lead(t_h), new = "new")) %>% 
     arrange(desc(t_h)) %>%
     replace_na(list(new = "og"))
+  df_n_foc <- df %>% 
+    filter(focal == "FALSE")
   df_foc <- df %>% 
-    filter(t_h == 15*foc + 6.359762, new == "og") 
-  ggplot(data = df, aes(t_h, light_ft)) +
+    filter(focal == "TRUE", new == "og") 
+  ggplot(data = df_n_foc, aes(t_h, light_ft)) +
     geom_line(colour='green') +
     geom_line(aes(t_h, light_ppa), colour='blue') +
     geom_point(data = df_foc, aes(t_h, light_ft), colour='red') +
     geom_point(data = df_foc, aes(t_h, light_ppa), colour='orange')
 }
 
-data <- model_simp(results[["H15_V0.25_L2.916_F1.99_S1"]])
+data <- model_simp(results[["H15_V0.1_L5.485_F1.99_S2"]])
 
-plotting_f(d = data, foc = 1.99)
-plotting(d = data, foc = 1.99)
+plotting(d = data)
 
-foc_tree <- function(d, foc, n) {
-  df <- d %>% 
-    mutate(focal_tree = t_h) %>% 
-    replace_na(list(focal_tree = 0)) %>% 
-    filter(focal_tree == 15 * 1.5 + 6.359762) %>% 
-    mutate(name = n)
-}
-
-df <- foc_tree(data, 1.5, "H15_V0.5_L2.916_F1.5_S1")
+#light interception/ 
