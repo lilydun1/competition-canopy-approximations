@@ -90,12 +90,21 @@ plotting <- function(d_nf, d_f) {
     geom_point(data = df_f, aes(t_h, light_ppa), colour='orange')
 }
 
-data_f <- model_simp_f(results[["H15_V0.5_L1.488_F1.99_S2"]])
+data_f <- model_simp_f(results[["H15_V0.5_L4.402_F1.99_S1"]])
+
 data_nf <- model_simp_nf(results[["H15_V0.5_L1.488_F1.99_S2"]])
 
 plotting(data_nf, data_f)
 
 #light interception
+I_0 = 383.9562 
+k = 0.5
+L = data_f %>% 
+  filter(focal == "TRUE") %>% 
+  select(lai_ppa) %>% 
+  as.numeric()
+
+I_z = I_0*exp(-k*L)
 
 
 
