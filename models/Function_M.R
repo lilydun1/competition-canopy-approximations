@@ -10,6 +10,10 @@ S <- c(1, 2, 3)
 
 combinations <- expand_grid(H, V, L, F, S) %>% 
   mutate(path = sprintf("simulations/H%s_V%s_L%s_F%s_S%s", H, V, L, F, S))
+combinations_basenames <- combinations$path %>% 
+  basename()
+combinations <- combinations %>% 
+  add_column(name = combinations_basenames)
 
 load_trees <- function(path) {
   trees <- parseFile(file.path(path,"trees.dat"))
@@ -54,7 +58,8 @@ model_simp_f <- function(data) {
       lai = cumsum(larea)/10204, 
       light_ft = exp(-0.5*lai),
       lai_ppa = floor(lai),
-      light_ppa = exp(-0.5*lai_ppa))
+      light_ppa = exp(-0.5*lai_ppa)) %>% 
+    as_tibble()
 }
 
 model_simp_nf <- function(data) {
@@ -90,29 +95,36 @@ plotting <- function(d_nf, d_f) {
     geom_point(data = df_f, aes(t_h, light_ppa), colour='orange')
 }
 
-data_f <- model_simp_f(results[["H15_V0.5_L4.402_F1.99_S1"]])
-
+data_f <- model_simp_f(results[["H15_V0_L4.402_F0.5_S1"]])
 data_nf <- model_simp_nf(results[["H15_V0.5_L1.488_F1.99_S2"]])
 
 plotting(data_nf, data_f)
 
-#light interception
-I_0 = 383.9562 
+#function to go through results and model_simp_F them all 
+simps <- results[["H15_V0_L0.466_F1.99_S1"]] %>% 
+  model_simp_f
+
+#function for absPAR to all 
+I_0 = 383.9562 #average for the whole day
 k = 0.5
-L = data_f %>% 
+L_ft = data_f %>% 
   filter(focal == "TRUE") %>% 
-  select(lai_ppa) %>% 
+  select(lai) %>% 
   as.numeric()
 
-I_z = I_0*exp(-k*L)
+I_z = I_0*exp(-k*L_ft)
 
-outputs <- data.frame(absPAR = I_z, H = 15, V = 0.5, L = 4.402, F = 1.99, S = 1)
+#function to run through them all to create tibbles for each with absPAR, H, V, L, F, S 
 
-outputs %>% 
-  ggplot(aes(F, absPAR)) + 
-  geom_point(aes(colour = as.factor(H))) + 
-  geom_line(aes(colour = as.factor(H))) + 
-  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(title = "PAR", x = "FT height", y = "Absorbed PAR", colour = "Height")
+df <- combinations %>% 
+  filter(name == "H15_V0_L4.402_F0.5_S1")
+
+outputs <- tibble(absPAR = I_z, H = df$H, V = df$V, L = df$L, F = df$L, S = df$S)
+
+
+
+
+
+
 
 
