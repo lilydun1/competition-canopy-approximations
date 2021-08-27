@@ -10,7 +10,7 @@ mn_outputs_A %>%
   geom_point(aes(colour = as.factor(H))) + 
   geom_line(aes(colour = as.factor(H))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(title = "PAR", x = "FT height", y = "Absorbed PAR", colour = "Height")
+  labs(title = "PAR", x = "FT height", y = "Absorbed PAR", colour = "MAESPA")
 
 
 mn_outputs_WD %>% 

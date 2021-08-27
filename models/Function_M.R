@@ -95,7 +95,8 @@ plotting <- function(d_nf, d_f) {
     geom_point(data = df_f, aes(t_h, light_ppa), colour='orange')
 }
 
-data_f <- model_simp_f(results[["H15_V0.5_L5.485_F0.01_S1"]])
+data_f <- model_simp_f(results[["H15_V0.5_L5.485_F1.99_S1"]])
+
 data_nf <- model_simp_nf(results[["H15_V0.5_L1.488_F1.99_S2"]])
 
 plotting(data_nf, data_f)
@@ -105,19 +106,23 @@ simps <- results[["H15_V0_L0.466_F1_S1"]] %>%
   model_simp_f
 
 #function for absPAR to all 
+PAR <- c(0.004657534, 0.007123288, 0.004109589, 0.004931507, 0.0630137, 30.73945, 160.7816, 412.2556, 721.6304, 
+         993.4989, 1166.151, 1239.936, 1199.67, 1106.995, 887.2534, 675.4101, 398.6479, 177.2134, 43.61918, 
+         1.04411, 0.004657534, 0.003287671, 0.005753425, 0.004109589)
+
 I_0 = 383.9562 #average PAR for the whole day
 k = 0.5
 L_ft = data_f %>% 
   filter(focal == "TRUE") %>% 
-  select(lai) %>% 
-  as.numeric()
+  pull(lai) 
 
 I_z = I_0*exp(-k*L_ft)
+#need to do this hourly 
 
 #function to run through them all to create tibbles for each with absPAR, H, V, L, F, S 
 
 df <- combinations %>% 
-  filter(name == "H15_V0.5_L5.485_F0.01_S1")
+  filter(name == "H15_V0.5_L5.485_F1.99_S1")
 
 outputs <- tibble(absPAR = I_z, H = df$H, V = df$V, L = df$L, F = df$L, S = df$S)
 

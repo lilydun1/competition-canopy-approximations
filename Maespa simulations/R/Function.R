@@ -97,5 +97,5 @@ run_simulation <- function(path) {
 load_output <- function(path){
   readdayflux(filename = file.path(path,"dayflx.dat")) %>% 
     as_tibble() %>% 
-    mutate(path = path)
+    mutate(path = path, name = path %>% basename() %>% gsub("_S[1-3]", "",., perl = TRUE))
 }

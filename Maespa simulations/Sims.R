@@ -30,7 +30,10 @@ output_A <- combinations_A$path %>%
 output_combined_A <- combinations_A %>% 
   left_join(output_A, by = "path")
 
-mn_outputs_A <- cbind(path, A, absPAR, absNIR, absTherm, netPs, totRF, totLE1, totLE2, totH)
+mn_outputs_A <- output_combined_A %>% 
+  group_by(H, V, L, F, Tree, name) %>% 
+  summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean) 
+
 
 #wet and dry 
 H <- c(15)
@@ -108,6 +111,11 @@ output_WD <- combinations_WD$path %>%
 
 output_combined_WD <- combinations_WD %>% 
   left_join(output_WD, by = "path")
+
+mn_outputs_WD <- output_combined_WD %>% 
+  group_by(H, V, L, F, WD, Tree, name) %>% 
+  summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean) 
+
 
 
 
