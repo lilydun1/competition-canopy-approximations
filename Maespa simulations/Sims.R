@@ -35,6 +35,11 @@ mn_outputs_A <- output_combined_A %>%
   summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean) 
 
 
+create_simulation(path = "simualtions/Q", template = "template", h_mn = 15, h_cv = 0.5, 
+                    LAI = 5.485, ft_h = 1.99, seed = 1)
+
+run_simulation(path = "simualtions/Q")
+
 #wet and dry 
 H <- c(15)
 V <- c(0.10, 0.25)

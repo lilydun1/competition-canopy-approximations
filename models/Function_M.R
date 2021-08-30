@@ -95,9 +95,11 @@ plotting <- function(d_nf, d_f) {
     geom_point(data = df_f, aes(t_h, light_ppa), colour='orange')
 }
 
+data_nf <- model_simp_nf(results[["H15_V0.5_L1.488_F1.99_S2"]])
+
 data_f <- model_simp_f(results[["H15_V0.5_L5.485_F1.99_S1"]])
 
-data_nf <- model_simp_nf(results[["H15_V0.5_L1.488_F1.99_S2"]])
+
 
 plotting(data_nf, data_f)
 
@@ -110,14 +112,16 @@ PAR <- c(0.004657534, 0.007123288, 0.004109589, 0.004931507, 0.0630137, 30.73945
          993.4989, 1166.151, 1239.936, 1199.67, 1106.995, 887.2534, 675.4101, 398.6479, 177.2134, 43.61918, 
          1.04411, 0.004657534, 0.003287671, 0.005753425, 0.004109589)
 
-I_0 = 383.9562 #average PAR for the whole day
-k = 0.5
 L_ft = data_f %>% 
   filter(focal == "TRUE") %>% 
   pull(lai) 
 
-I_z = I_0*exp(-k*L_ft)
-#need to do this hourly 
+absPAR_hour <- tibble(hour = c(1:24), PAR = PAR, absPAR = PAR[1:24]*exp(-0.5*L_ft), 
+                      absPAR_short = floor(absPAR))
+
+f <- function(x) {x*exp(-0.5*0.1400039)}
+  
+integrate(f, lower = 0.003287671, upper = 1239.936)
 
 #function to run through them all to create tibbles for each with absPAR, H, V, L, F, S 
 
