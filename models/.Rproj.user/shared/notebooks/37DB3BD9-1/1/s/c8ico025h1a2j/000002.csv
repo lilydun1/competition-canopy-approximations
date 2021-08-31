@@ -1,7 +1,0 @@
-"0","```r
-PAR <- lm(hrPs~PAR, data=joined51)
-TAIR <- lm(hrPs~TAIR, data=joined51)
-RHperc <- lm(hrPs~RHperc, data=joined51)
-RAD <- lm(hrPs~RAD, data=joined51)
-WIND <- lm(hrPs~WIND, data=joined51)
-```"

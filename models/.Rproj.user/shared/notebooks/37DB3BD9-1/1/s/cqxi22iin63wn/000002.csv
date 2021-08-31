@@ -1,5 +1,0 @@
-"0","```r
-AC <- LAtree/ALAC
-cw <- CWfun(crownshape, AC, cwcl)
-cl <- cw/cwcl
-```"

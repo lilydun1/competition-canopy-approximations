@@ -1,5 +1,0 @@
-"0","```r
-hrflux51 <- hrflux %>% 
-  filter(DOY == \"1\") %>% 
-  select(HOUR, hrPAR, hrNIR, hrTHM, hrPs)
-```"

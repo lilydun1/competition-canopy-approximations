@@ -1,3 +1,0 @@
-"0","```r
-replaceNameList(namelist=\"dates\", datfile=\"confile.dat\", vals=list(startdate= \"22/02/01\", enddate = \"28/02/01\"))
-```"

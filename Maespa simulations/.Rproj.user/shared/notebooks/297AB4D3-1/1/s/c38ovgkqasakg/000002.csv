@@ -1,8 +1,0 @@
-"0","```r
-replacePAR(\"trees.dat\", \"values\", \"indivlarea\", newval=twenty)
-replacePAR(\"trees.dat\", \"values\", \"indivhttrunk\", newval=twenty)
-replacePAR(\"trees.dat\", \"values\", \"indivdiam\", newval=twenty)
-replacePAR(\"trees.dat\", \"values\", \"indivhtcrown\", newval=ten)
-replacePAR(\"trees.dat\", \"values\", \"indivrady\", newval=two)
-replacePAR(\"trees.dat\", \"values\", \"indivradx\", newval=three)
-```"

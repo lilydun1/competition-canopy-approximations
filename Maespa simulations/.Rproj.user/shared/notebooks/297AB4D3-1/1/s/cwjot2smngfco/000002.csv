@@ -1,7 +1,0 @@
-"0","```r
-create_trees()
-
-```"
-"1","Error in rnorm(1e+06, mean = h_mn, sd = h_sd) %>% subset(., . >= 0) : 
-  could not find function \"%>%\"
-"

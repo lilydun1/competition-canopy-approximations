@@ -1,3 +1,0 @@
-"0","```r
-met <- readmet(filename = \"Met.dat\")
-```"

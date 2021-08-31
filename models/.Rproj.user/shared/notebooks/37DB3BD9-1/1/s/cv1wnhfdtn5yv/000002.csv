@@ -1,4 +1,0 @@
-"0","```r
-con1 <- parseFile(\"confile.dat\")
-names(con1)
-```"

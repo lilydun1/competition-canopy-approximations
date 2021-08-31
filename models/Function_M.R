@@ -40,6 +40,8 @@ load_trees <- function(path) {
     filter(x > 27.999, x < 168.001, y > 27.999, y < 168.001)
 }
 
+
+
 results <- combinations$path[1:nrow(combinations)] %>% 
   purrr::map(load_trees) 
 
@@ -95,43 +97,54 @@ plotting <- function(d_nf, d_f) {
     geom_point(data = df_f, aes(t_h, light_ppa), colour='orange')
 }
 
-data_nf <- model_simp_nf(results[["H15_V0.5_L1.488_F1.99_S2"]])
+df <- load_trees(path = "simulations/1")
+data_f <- model_simp_f(df)
 
-data_f <- model_simp_f(results[["H15_V0.5_L5.485_F1.99_S1"]])
+data_nf <- model_simp_nf(results[["H15_V0.5_L1.488_F0.01_S2"]])
 
-
+data_f <- model_simp_f(results[["H15_V0.5_L5.485_F0.15_S1"]])
 
 plotting(data_nf, data_f)
 
-#function to go through results and model_simp_F them all 
-simps <- results[["H15_V0_L0.466_F1_S1"]] %>% 
-  model_simp_f
 
-#function for absPAR to all 
-PAR <- c(0.004657534, 0.007123288, 0.004109589, 0.004931507, 0.0630137, 30.73945, 160.7816, 412.2556, 721.6304, 
-         993.4989, 1166.151, 1239.936, 1199.67, 1106.995, 887.2534, 675.4101, 398.6479, 177.2134, 43.61918, 
-         1.04411, 0.004657534, 0.003287671, 0.005753425, 0.004109589)
+data_f <- model_simp_f(results[["H15_V0.5_L5.485_F1.99_S1"]])
+
 
 L_ft = data_f %>% 
   filter(focal == "TRUE") %>% 
   pull(lai) 
 
-absPAR_hour <- tibble(hour = c(1:24), PAR = PAR, absPAR = PAR[1:24]*exp(-0.5*L_ft), 
-                      absPAR_short = floor(absPAR))
+L_ft = data_f %>% 
+  pull(lai) 
 
-f <- function(x) {x*exp(-0.5*0.1400039)}
-  
-integrate(f, lower = 0.003287671, upper = 1239.936)
+met <- readmet(filename = "met.dat", nlines = -1)
 
-#function to run through them all to create tibbles for each with absPAR, H, V, L, F, S 
+la = 47.62
 
-df <- combinations %>% 
-  filter(name == "H15_V0.5_L5.485_F1.99_S1")
+PAR_calculator <- 
+  tibble(
+  PAR_inst = met$PAR, 
+  time = met$TIME) %>% 
+ mutate(
+   delta_t = c(diff(time[1:2]), diff(time)),
+   absPAR_inst = PAR_inst*exp(-0.5*L_ft),#mu PAR m-2 s-1
+   W = absPAR_inst/2.02, #W PAR m-2 eqn 38 from paper 
+   MJ = W*0.0036 #MJ PAR m-2 h-1 eqn 12 from paper
+ ) %>% 
+  summarise(tree = sum(MJ*delta_t)*la) #MJ PAR tree-1 day-1 
 
-outputs <- tibble(absPAR = I_z, H = df$H, V = df$V, L = df$L, F = df$L, S = df$S)
+PAR_inst = met$PAR
+PAR_calculator_ld <- 
+  tibble(
+    PAR_i = rep(PAR_inst, 3600), 
+    absPAR = PAR_i*exp(-0.5*L_ft), 
+    W = absPAR/2.02, 
+    MJ = W*0.0864, 
+    tree = MJ*1
+  )
 
- 
 
+mean(PAR_calculator_ld$tree)
 
 
 
