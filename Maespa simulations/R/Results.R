@@ -3,6 +3,7 @@ names <- as_labeller(
     `0.466` = "LAI 0.467", `1.488`= "LAI 1.349", `2.916`= "LAI 2.917", `4.402`= "LAI 4.485", `5.485`= "LAI 5.395")
 )
 
+
 #average
 mn_outputs_A %>% 
   select(F, absPAR, H, V, L) %>%

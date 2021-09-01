@@ -1,5 +1,6 @@
 library(Maeswrap)
 library(tidyverse)
+library(ggplot2)
 
 H <- c(15)
 V <- c(0.00, 0.10, 0.25, 0.50)
@@ -102,10 +103,9 @@ results_nf <- results %>%
 results_f <- results %>% 
   purrr::map(model_simp_f)
 
-data_nf <- results_nf[["H15_V0.5_L1.488_F0.01_S2"]])
+data_nf <- results_nf[["H15_V0.5_L1.488_F0.01_S2"]]
 
 data_f <- results_f[["H15_V0.5_L5.485_F0.15_S1"]]
-
 
 PAR_calculator <- function(data, indi_la = 47.62) {
   met <- readmet(filename = "met.dat", nlines = -1)
@@ -126,31 +126,52 @@ PAR_calculator <- function(data, indi_la = 47.62) {
     summarise(tree = (sum(MJ*delta_t)*la))
 }
 
-met <- readmet(filename = "met.dat", nlines = -1)
+results_PAR <- results_f %>% 
+  purrr::map(PAR_calculator)
 
-L_ft = data %>% 
-  filter(focal == "TRUE") %>% 
-  pull(lai) 
+combining_results <- function(sim_name) {
+  combined_results <- combinations %>% 
+    filter(name == sim_name) %>% 
+    bind_cols(results_PAR[[sim_name]])
+}
 
-la = 47.62
-  
-PAR_calculator <- 
-  tibble(
-  PAR_inst = met$PAR, 
-  time = met$TIME) %>% 
- mutate(
-   delta_t = c(diff(time[1:2]), diff(time)),
-   absPAR_inst = PAR_inst*exp(-0.5*L_ft),#mu PAR m-2 s-1
-   W = absPAR_inst/2.02, #W PAR m-2 eqn 38 from paper 
-   MJ = W*0.0036 #MJ PAR m-2 h-1 eqn 12 from paper
- ) %>% 
-  summarise(tree = (sum(MJ*delta_t)*la)) #MJ PAR tree-1 day-1 
+combined_results <- combinations$name[1:nrow(combinations)] %>% 
+  purrr::map(combining_results) 
 
+names(combined_results) <- combinations$name[1:nrow(combinations)] %>% 
+  basename()
 
+organising_results <- function(data) {
+  df <- as.data.frame(matrix(unlist(data), nrow=length(unlist(data[1])))) 
+  row.names(df) <- c("H", "V", "L", "F", "S", "path", "name", "tree")
+  df <- t(df)
+  row.names(df) <- 1:nrow(combinations)
+  df <- df %>% as_tibble() %>% 
+    select(H, V, L, F, S, path, tree) %>% 
+    mutate(
+      name = path %>% basename() %>% gsub("_S[1-3]", "",., perl = TRUE)
+    )
+  df <-  df %>% 
+    transform(tree = as.numeric(tree), F = as.numeric(F), 
+                  H = as.numeric(H), V = as.numeric(V),
+                  L = as.numeric(L), S = as.numeric(S))
+  df <- df %>% 
+    group_by(H, V, L, F, name) %>% 
+    summarise_at(vars(tree), mean)
+}
 
-df <- load_trees(path = "simulations/1")
-data_f <- model_simp_f(df)
-L_ft = data_f %>% 
-  pull(lai) 
+d <- organising_results(combined_results)
 
+names <- as_labeller(
+  c(`0` = "V 0", `0.1` = "V 0.1", `0.25` = "V 0.25", `0.5` = "V 0.5", `0.75` = "V 0.75", 
+    `0.466` = "LAI 0.467", `1.488`= "LAI 1.349", `2.916`= "LAI 2.917", `4.402`= "LAI 4.485", `5.485`= "LAI 5.395")
+)
+
+d %>% 
+  select(F, tree, H, V, L) %>%
+  ggplot(aes(F, tree)) + 
+  geom_point(aes(colour = as.factor(H))) + 
+  geom_line(aes(colour = as.factor(H))) + 
+  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
+  labs(title = "PAR", x = "FT height", y = "Absorbed PAR", colour = "Flat top")
 
