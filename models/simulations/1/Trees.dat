@@ -26,14 +26,14 @@ crown	radius	in	the	x-direction.
 &indivradx
 nodates = 1
 values =
-0.5
+2.543905
 /
 
 crown	radius	in	the	y-direction.
 &indivrady
 nodates = 1
 values =
-0.5
+2.543905
 /
 
 crown	height	for	each	tree.
@@ -61,6 +61,6 @@ leaf	area
 &indivlarea
 nodates = 1
 values =
-1
+47.62
 /
 

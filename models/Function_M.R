@@ -40,8 +40,6 @@ load_trees <- function(path) {
     filter(x > 27.999, x < 168.001, y > 27.999, y < 168.001)
 }
 
-
-
 results <- combinations$path[1:nrow(combinations)] %>% 
   purrr::map(load_trees) 
 
@@ -96,31 +94,46 @@ plotting <- function(d_nf, d_f) {
     geom_point(data = df_f, aes(t_h, light_ft), colour='red') +
     geom_point(data = df_f, aes(t_h, light_ppa), colour='orange')
 }
-
-df <- load_trees(path = "simulations/1")
-data_f <- model_simp_f(df)
-
-data_nf <- model_simp_nf(results[["H15_V0.5_L1.488_F0.01_S2"]])
-
-data_f <- model_simp_f(results[["H15_V0.5_L5.485_F0.15_S1"]])
-
 plotting(data_nf, data_f)
 
+results_nf <- results %>% 
+  purrr::map(model_simp_nf)
 
-data_f <- model_simp_f(results[["H15_V0.5_L5.485_F1.99_S1"]])
+results_f <- results %>% 
+  purrr::map(model_simp_f)
+
+data_nf <- results_nf[["H15_V0.5_L1.488_F0.01_S2"]])
+
+data_f <- results_f[["H15_V0.5_L5.485_F0.15_S1"]]
 
 
-L_ft = data_f %>% 
-  filter(focal == "TRUE") %>% 
-  pull(lai) 
-
-L_ft = data_f %>% 
-  pull(lai) 
+PAR_calculator <- function(data, indi_la = 47.62) {
+  met <- readmet(filename = "met.dat", nlines = -1)
+  la = indi_la
+  L_ft = data %>% 
+    filter(focal == "TRUE") %>% 
+    pull(lai) 
+  PAR_calculator <- 
+    tibble(
+      PAR_inst = met$PAR, 
+      time = met$TIME) %>% 
+    mutate(
+      delta_t = c(diff(time[1:2]), diff(time)),
+      absPAR_inst = PAR_inst*exp(-0.5*L_ft),#mu PAR m-2 s-1
+      W = absPAR_inst/2.02, #W PAR m-2 eqn 38 from paper 
+      MJ = W*0.0036 #MJ PAR m-2 h-1 eqn 12 from paper
+    ) %>% 
+    summarise(tree = (sum(MJ*delta_t)*la))
+}
 
 met <- readmet(filename = "met.dat", nlines = -1)
 
-la = 47.62
+L_ft = data %>% 
+  filter(focal == "TRUE") %>% 
+  pull(lai) 
 
+la = 47.62
+  
 PAR_calculator <- 
   tibble(
   PAR_inst = met$PAR, 
@@ -131,23 +144,13 @@ PAR_calculator <-
    W = absPAR_inst/2.02, #W PAR m-2 eqn 38 from paper 
    MJ = W*0.0036 #MJ PAR m-2 h-1 eqn 12 from paper
  ) %>% 
-  summarise(tree = sum(MJ*delta_t)*la) #MJ PAR tree-1 day-1 
-
-PAR_inst = met$PAR
-PAR_calculator_ld <- 
-  tibble(
-    PAR_i = rep(PAR_inst, 3600), 
-    absPAR = PAR_i*exp(-0.5*L_ft), 
-    W = absPAR/2.02, 
-    MJ = W*0.0864, 
-    tree = MJ*1
-  )
-
-
-mean(PAR_calculator_ld$tree)
+  summarise(tree = (sum(MJ*delta_t)*la)) #MJ PAR tree-1 day-1 
 
 
 
-
+df <- load_trees(path = "simulations/1")
+data_f <- model_simp_f(df)
+L_ft = data_f %>% 
+  pull(lai) 
 
 
