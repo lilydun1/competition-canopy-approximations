@@ -107,7 +107,7 @@ data_nf <- results_nf[["H15_V0.5_L1.488_F0.01_S2"]]
 
 data_f <- results_f[["H15_V0.5_L5.485_F0.15_S1"]]
 
-PAR_calculator <- function(data, indi_la = 47.62) {
+PAR_calculator_ft <- function(data,indi_la = 47.62) {
   met <- readmet(filename = "met.dat", nlines = -1)
   la = indi_la
   L_ft = data %>% 
@@ -123,55 +123,113 @@ PAR_calculator <- function(data, indi_la = 47.62) {
       W = absPAR_inst/2.02, #W PAR m-2 eqn 38 from paper 
       MJ = W*0.0036 #MJ PAR m-2 h-1 eqn 12 from paper
     ) %>% 
-    summarise(tree = (sum(MJ*delta_t)*la))
+    summarise(absPAR = (sum(MJ*delta_t)*la))
 }
 
-results_PAR <- results_f %>% 
-  purrr::map(PAR_calculator)
+PAR_calculator_ppa <- function(data,indi_la = 47.62) {
+  met <- readmet(filename = "met.dat", nlines = -1)
+  la = indi_la
+  L_ft = data %>% 
+    filter(focal == "TRUE") %>% 
+    pull(lai_ppa) 
+  PAR_calculator <- 
+    tibble(
+      PAR_inst = met$PAR, 
+      time = met$TIME) %>% 
+    mutate(
+      delta_t = c(diff(time[1:2]), diff(time)),
+      absPAR_inst = PAR_inst*exp(-0.5*L_ft),#mu PAR m-2 s-1
+      W = absPAR_inst/2.02, #W PAR m-2 eqn 38 from paper 
+      MJ = W*0.0036 #MJ PAR m-2 h-1 eqn 12 from paper
+    ) %>% 
+    summarise(absPAR = (sum(MJ*delta_t)*la))
+}
 
-combining_results <- function(sim_name) {
-  combined_results <- combinations %>% 
+results_PAR_ft <- results_f %>% 
+  purrr::map(PAR_calculator_ft)
+
+results_PAR_ppa <- results_f %>% 
+  purrr::map(PAR_calculator_ppa)
+
+combining_results_ft <- function(sim_name) {
+  df <- combinations %>% 
     filter(name == sim_name) %>% 
-    bind_cols(results_PAR[[sim_name]])
+    bind_cols(results_PAR_ft[[sim_name]])
 }
 
-combined_results <- combinations$name[1:nrow(combinations)] %>% 
-  purrr::map(combining_results) 
+combining_results_ppa <- function(sim_name) {
+  df <- combinations %>% 
+    filter(name == sim_name) %>% 
+    bind_cols(results_PAR_ppa[[sim_name]])
+}
 
-names(combined_results) <- combinations$name[1:nrow(combinations)] %>% 
+combined_results_ft <- combinations$name[1:nrow(combinations)] %>% 
+  purrr::map(combining_results_ft) 
+
+names(combined_results_ft) <- combinations$name[1:nrow(combinations)] %>% 
+  basename()
+
+combined_results_ppa <- combinations$name[1:nrow(combinations)] %>% 
+  purrr::map(combining_results_ppa) 
+
+names(combined_results_ppa) <- combinations$name[1:nrow(combinations)] %>% 
   basename()
 
 organising_results <- function(data) {
   df <- as.data.frame(matrix(unlist(data), nrow=length(unlist(data[1])))) 
-  row.names(df) <- c("H", "V", "L", "F", "S", "path", "name", "tree")
+  row.names(df) <- c("H", "V", "L", "F", "S", "path", "name", "absPAR")
   df <- t(df)
   row.names(df) <- 1:nrow(combinations)
   df <- df %>% as_tibble() %>% 
-    select(H, V, L, F, S, path, tree) %>% 
+    select(H, V, L, F, S, path, absPAR) %>% 
     mutate(
       name = path %>% basename() %>% gsub("_S[1-3]", "",., perl = TRUE)
     )
   df <-  df %>% 
-    transform(tree = as.numeric(tree), F = as.numeric(F), 
+    transform(absPAR = as.numeric(absPAR), F = as.numeric(F), 
                   H = as.numeric(H), V = as.numeric(V),
                   L = as.numeric(L), S = as.numeric(S))
   df <- df %>% 
     group_by(H, V, L, F, name) %>% 
-    summarise_at(vars(tree), mean)
+    summarise_at(vars(absPAR), mean)
 }
 
-d <- organising_results(combined_results)
+final_results_ft <- organising_results(combined_results_ft)
+
+final_results_ppa <- organising_results(combined_results_ppa)
+
+final_results_ft <- final_results_ft %>% add_column(model = "FT")
+final_results_ppa <- final_results_ppa %>% add_column(model = "PPA")
+
+final_results <- rbind(final_results_ft, final_results_ppa)
 
 names <- as_labeller(
   c(`0` = "V 0", `0.1` = "V 0.1", `0.25` = "V 0.25", `0.5` = "V 0.5", `0.75` = "V 0.75", 
     `0.466` = "LAI 0.467", `1.488`= "LAI 1.349", `2.916`= "LAI 2.917", `4.402`= "LAI 4.485", `5.485`= "LAI 5.395")
 )
 
-d %>% 
-  select(F, tree, H, V, L) %>%
-  ggplot(aes(F, tree)) + 
+final_results_ft %>% 
+  select(F, absPAR, H, V, L) %>%
+  ggplot(aes(F, absPAR)) + 
   geom_point(aes(colour = as.factor(H))) + 
   geom_line(aes(colour = as.factor(H))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(title = "PAR", x = "FT height", y = "Absorbed PAR", colour = "Flat top")
+
+
+final_results_ppa %>% 
+  select(F, absPAR, H, V, L) %>%
+  ggplot(aes(F, absPAR)) + 
+  geom_point(aes(colour = as.factor(H))) + 
+  geom_line(aes(colour = as.factor(H))) + 
+  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
+  labs(title = "PAR", x = "FT height", y = "Absorbed PAR", colour = "Flat top")
+
+final_results %>% 
+  select(F, absPAR, model, V, L) %>%
+  ggplot(aes(F, absPAR)) + 
+  geom_point(aes(colour = as.factor(model))) + 
+  geom_line(aes(colour = as.factor(model))) + 
+  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
+  labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
 
