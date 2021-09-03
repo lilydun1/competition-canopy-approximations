@@ -233,3 +233,10 @@ final_results %>%
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
 
+maespa <- read.csv("A.csv")
+
+maespa <- maespa %>% 
+  select(H, V, L, F, name, absPAR) %>% 
+  add_column(model = "MAESPA") 
+
+final_results_m  <- rbind(maespa, final_results)
