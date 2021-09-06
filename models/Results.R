@@ -26,36 +26,3 @@ final_results %>%
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
-
-maespa <- read.csv("A.csv")
-
-maespa <- maespa %>% 
-  select(H, V, L, F, name, absPAR) %>% 
-  add_column(model = "MAESPA") 
-
-maespa %>% 
-  select(F, absPAR, model, V, L) %>%
-  ggplot(aes(F, absPAR)) + 
-  geom_point(aes(colour = as.factor(model))) + 
-  geom_line(aes(colour = as.factor(model))) + 
-  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
-
-#playing 
-
-mean(final_results_ft$absPAR/maespa$absPAR)
-
-df <- maespa %>% 
-  mutate(
-    absPAR = absPAR*3.786782
-  )
-
-d <- rbind(df, final_results_ft)
-
-d %>% 
-  select(F, absPAR, model, V, L) %>%
-  ggplot(aes(F, absPAR)) + 
-  geom_point(aes(colour = as.factor(model))) + 
-  geom_line(aes(colour = as.factor(model))) + 
-  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
