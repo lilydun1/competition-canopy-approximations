@@ -22,6 +22,3 @@ mn_outputs_WD %>%
   geom_line(aes(colour = as.factor(WD))) +
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(title = "photosynthesis", x = "FT height", y = "Gross photosynthesis", colour = "Wet or Dry")
-
-A <- as.data.frame(mn_outputs_A) 
-write.csv(A, 'A.csv')
