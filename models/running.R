@@ -12,8 +12,10 @@ S <- c(1, 2, 3)
 #setting up combinations of variables 
 combinations <- expand_grid(H, V, L, F, S) %>% 
   mutate(path = sprintf("simulations/H%s_V%s_L%s_F%s_S%s", H, V, L, F, S))
+
 combinations_basenames <- combinations$path %>% 
   basename()
+
 combinations <- combinations %>% 
   add_column(name = combinations_basenames)
 
@@ -24,21 +26,21 @@ results <- combinations$path[1:nrow(combinations)] %>%
 names(results) <- combinations$path[1:nrow(combinations)] %>% 
   basename()
 
-#setting up the lai and light conditions for ft and ppa one with the focal tree one without
+#setting up the lai and light conditions for ft and ppa: one with the focal tree one without
 results_nf <- results %>% 
   purrr::map(model_simp_nf)
 
 results_f <- results %>% 
   purrr::map(model_simp_f)
 
-#working out the absPAR for the focal tree in each of the MAESPA simualtions 
+#working out the absPAR for the focal tree in each of the MAESPA simulations 
 results_PAR_ft <- results_f %>% 
   purrr::map(PAR_calculator_ft)
 
 results_PAR_ppa <- results_f %>% 
   purrr::map(PAR_calculator_ppa)
 
-#combining the different variables from combinations to the right output 
+#combining the different variables from combinations to the right absPAR output 
 combined_results_ft <- combinations$name[1:nrow(combinations)] %>% 
   purrr::map(combining_results_ft) 
 

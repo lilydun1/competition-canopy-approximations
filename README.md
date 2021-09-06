@@ -7,16 +7,22 @@ Honours project on competition global vegetation models
 # Pre-
 
 # How to guide 
-1.  Go into the file of Maespa simualtion 
+1.  Go into the file of Maespa simulation 
 
 
 # Dictionary 
-Maespa simualtions
-R folder = 
+Maespa simulations
+R folder =
+functions =
+sims = 
+results = 
 
 
 models 
-simulations = 
+simulations = simulations from 
+functions_m = 
+running = 
+results = 
 
 
 
