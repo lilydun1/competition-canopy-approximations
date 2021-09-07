@@ -91,14 +91,51 @@ PAR_calculator_ft <- function(data, indi_la = 47.62) {
     summarise(absPAR = (sum(MJ*delta_t)*la)) #MJ PAR tree-1 day-1 
 }
 
-#trying to get same result as MAESPA with a single tree with a la of 0.1 
-#try is the lone tree with 0.1 la simulation folder within the folder simualtions 
-maespa_0.1_result = 0.5614
-df <- "simulations/try" %>% 
-  load_trees()
-df <- model_simp_f(df)
-d$focal = TRUE
-df <- PAR_calculator_ft(d, indi_la = 0.1)
+new_cal <- function(data) {
+  # conatnt to converts ymol/s to M J / h
+  UMOLperStoMJperH <-
+    3600 /  # s / hr
+    4.57 /  # umol quanta / J
+    10^6    # J / MJ
+  L_ft = data %>% 
+    filter(focal == "TRUE") %>% 
+    pull(lai) 
+  # load met and convert PAR to J/hr
+  met <- 
+    readmet(filename = "met.dat", nlines = -1) %>% 
+    as_tibble() %>% 
+    select(time = TIME, PAR) %>%
+    mutate(      
+      PAR = 0.77 * PAR * exp(-0.77*L_ft),
+      MJ_per_H = PAR  * UMOLperStoMJperH  # MJ
+    )
+  # integrate over the day using trapezoidal integration
+  pracma::trapz(met$time, met$MJ_per_H)*47.62 %>% as_tibble() %>% 
+    rename(absPAR = value)
+}
+
+# conatnt to converts ymol/s to M J / h
+UMOLperStoMJperH <-
+  3600 /  # s / hr
+  4.57 /  # umol quanta / J
+  10^6    # J / MJ
+#getting the LAI above the focal tree
+data = results_f[["H15_V0.1_L4.402_F1.75_S3"]]
+L_ft = data %>% 
+  filter(focal == "TRUE") %>% 
+  pull(lai) 
+# load met and convert PAR to J/hr
+met <- 
+  readmet(filename = "met.dat", nlines = -1) %>% 
+  as_tibble() %>% 
+  select(time = TIME, PAR) %>%
+  mutate(      
+    PAR = 0.77 * PAR * exp(-0.77*L_ft),
+    MJ_per_H = PAR  * UMOLperStoMJperH  # MJ
+  )
+
+# integrate over the day using trapezoidal integration
+pracma::trapz(met$time, met$MJ_per_H)*47.62
 
 PAR_calculator_ppa <- function(data,indi_la = 47.62) {
   met <- readmet(filename = "met.dat", nlines = -1)
@@ -123,6 +160,12 @@ combining_results_ft <- function(sim_name) {
   df <- combinations %>% 
     filter(name == sim_name) %>% 
     bind_cols(results_PAR_ft[[sim_name]])
+}
+
+new_combining_results_ft <- function(sim_name) {
+  df <- combinations %>% 
+    filter(name == sim_name) %>% 
+    bind_cols(new_results_PAR_ft[[sim_name]])
 }
 
 combining_results_ppa <- function(sim_name) {
@@ -150,29 +193,12 @@ organising_results <- function(data) {
     summarise_at(vars(absPAR), mean)
 }
 
-
-results[[1000]] %>% 
-  mutate(
-    t_h = htcrown + httrunk
-  )
-
-h <- seq(0, 50, by=100)
-E <- 0*h
-
-leaf area from ht_trunk to ht_crown
-
-# Crown shapes
-
-if(crownshape == "ellipsoid")
-
-  radx <- rady <- 2.54
-  htcrown <- 6.36
-  httrunk <- 3
-  larea <- 47.62
-  
-  
-  deep_leaf_distribtuion <- function() {
-  # adpaytioan from Mawrap, https://github.com/RemkoDuursma/Maeswrap/blob/master/R/coord3dshape.R
+deep_leaf_distribtuion <- function(httrunk) {
+  # adaption from Maeswrap, https://github.com/RemkoDuursma/Maeswrap/blob/master/R/coord3dshape.R
+  htcrown = 6.36
+  radx = 2.54
+  rady = 2.54
+  larea = 47.62
   n_slices <- 50
   z <- seq(0, 1, length.out = n_slices)
   zabs <- z*htcrown
@@ -182,29 +208,44 @@ if(crownshape == "ellipsoid")
   slice_xs_area <- 3.14*rx*ry
   slice_xs_vol <- (htcrown/n_slices)*slice_xs_area
   slice_volume_frac <- slice_xs_vol/sum(slice_xs_vol)
-  
   tibble(
     h = httrunk + zabs,
     larea = larea*slice_volume_frac
     )
+}
+
+trying <- at$httrunk[1:nrow(d)] %>% 
+  purrr::map(deep_leaf_distribtuion) 
+
+deep_crown <- function(d) {
+  trying <- at$httrunk[1:nrow(d)] %>% 
+    purrr::map(deep_leaf_distribtuion) 
+  data <- plyr::ldply(trying, data.frame)
+  df <- as_tibble(rep(1:length(trying), times = 50)) %>% 
+    arrange(value)
+  data <- data %>% cbind(df) 
+  data <- data %>% 
+    arrange(desc(h)) %>% 
+    mutate(la = cumsum(larea)/10204)
+  if(nrow(data) == 100*50) {
+    data <- data %>% 
+      filter(value == 55)
+  } else if(nrow(data) == 289*50) {
+    data <- data %>% 
+      filter(value == 145)
+  } else if(nrow(data) == 625*50) {
+    data <- data %>% 
+      filter(value == 313)
+  } else if(nrow(data) == 961*50) {
+    data <- data %>% 
+      filter(value == 481)
+  } else if(nrow(data) == 1156*50) {
+    data <- data %>% 
+      filter(value == 595)
   }
-  
-  apply to every tree
-  mutate(depth = pmap(deep_leaf_distribtuion, ))
-  
-  
-  leaf_
-  
-  r <- CW/2
-x <- x0 + r*distfun*cos(angs)
-y <- y0 + r*distfun*sin(angs)
-z <- z0 + z*CL
+}
 
-
-
-
-
-
-
+df <- results %>% 
+  purrr::map(deep_crown) 
 
 

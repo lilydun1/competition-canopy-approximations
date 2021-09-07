@@ -37,6 +37,10 @@ results_f <- results %>%
 results_PAR_ft <- results_f %>% 
   purrr::map(PAR_calculator_ft)
 
+#new
+new_results_PAR_ft <- results_f %>% 
+  purrr::map(new_cal)
+
 results_PAR_ppa <- results_f %>% 
   purrr::map(PAR_calculator_ppa)
 
@@ -45,6 +49,12 @@ combined_results_ft <- combinations$name[1:nrow(combinations)] %>%
   purrr::map(combining_results_ft) 
 
 names(combined_results_ft) <- combinations$name[1:nrow(combinations)] %>% 
+  basename()
+#
+new_combined_results_ft <- combinations$name[1:nrow(combinations)] %>% 
+  purrr::map(new_combining_results_ft) 
+#
+names(new_combined_results_ft) <- combinations$name[1:nrow(combinations)] %>% 
   basename()
 
 combined_results_ppa <- combinations$name[1:nrow(combinations)] %>% 
@@ -56,8 +66,24 @@ names(combined_results_ppa) <- combinations$name[1:nrow(combinations)] %>%
 #turning the list of lists into a tibble and averaging the three seeds 
 final_results_ft <- organising_results(combined_results_ft) %>% add_column(model = "FT")
 
+new_final_results_ft <- organising_results(new_combined_results_ft) %>% add_column(model = "FT")
+
 final_results_ppa <- organising_results(combined_results_ppa) %>% add_column(model = "PPA")
 
 final_results <- rbind(final_results_ft, final_results_ppa)
 
 
+maespa <- read_csv("A.csv") 
+maespa <- maespa %>% 
+  select( H, V, L, F, name, absPAR) %>% 
+  add_column(model = "maespa")
+
+trying <- rbind(new_final_results_ft, maespa)
+
+trying %>% 
+  select(F, absPAR, model, V, L) %>%
+  ggplot(aes(F, absPAR)) + 
+  geom_point(aes(colour = as.factor(model))) + 
+  geom_line(aes(colour = as.factor(model))) + 
+  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
+  labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
