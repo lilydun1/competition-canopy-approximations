@@ -214,11 +214,8 @@ deep_leaf_distribtuion <- function(httrunk) {
     )
 }
 
-trying <- at$httrunk[1:nrow(d)] %>% 
-  purrr::map(deep_leaf_distribtuion) 
-
 deep_crown <- function(d) {
-  trying <- at$httrunk[1:nrow(d)] %>% 
+  trying <- d$httrunk[1:nrow(d)] %>% 
     purrr::map(deep_leaf_distribtuion) 
   data <- plyr::ldply(trying, data.frame)
   df <- as_tibble(rep(1:length(trying), times = 50)) %>% 
