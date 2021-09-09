@@ -4,6 +4,40 @@ library(tidyverse)
 
 source("r/Function.R")
 
+#variation in the focal tree LAI 
+H <- c(15)
+V <- c(0.10)
+L <- c(2.916)
+F <- c(1.99, 1.85, 1.75, 1.60, 1.50, 1.35, 1.25, 1.15, 1.05, 1.00, 
+       0.95, 0.85, 0.75, 0.65, 0.50, 0.40, 0.25, 0.15, 0.01)
+fla <- c(0.1, 0.5, 1, 10, 50)
+S <- c(1, 2, 3)
+
+combinations_new <- expand_grid(H, V, L, F, fla, S) %>% 
+  mutate(path = sprintf("simulations_new/H%s_V%s_L%s_F%s_fla%s_S%s", H, V, L, F, fla, S))
+
+for(i in 1:nrow(combinations_new)) {
+  create_simulation(path = combinations_new$path[i], template = "template_A", 
+                    h_mn = combinations_new$H[i], h_cv = combinations_new$V[i], 
+                    LAI = combinations_new$L[i], ft_h = combinations_new$F[i], 
+                    fla = combinations_new$fla[i], seed = combinations_new$S[i])
+}
+
+for(i in 1:nrow(combinations_new)) {
+  run_simulation(path = combinations_new$path[i])
+}
+
+output_new <- combinations_new$path %>% 
+  purrr:: map_df(load_output)
+
+output_combined_new <- combinations_new %>% 
+  left_join(output_new, by = "path")
+
+mn_outputs_new <- output_combined_new %>% 
+  group_by(H, V, L, F, fla, Tree, name) %>% 
+  summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean) 
+
+
 #for the average one with everything
 H <- c(15)
 V <- c(0.00, 0.10, 0.25, 0.50)
@@ -33,12 +67,6 @@ output_combined_A <- combinations_A %>%
 mn_outputs_A <- output_combined_A %>% 
   group_by(H, V, L, F, Tree, name) %>% 
   summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean) 
-
-
-create_simulation(path = "simualtions/Q", template = "template", h_mn = 15, h_cv = 0.5, 
-                    LAI = 5.485, ft_h = 1.99, seed = 1)
-
-run_simulation(path = "simualtions/Q")
 
 #wet and dry 
 H <- c(15)

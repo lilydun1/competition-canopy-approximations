@@ -26,3 +26,20 @@ final_results %>%
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
+
+final_results_new %>% 
+  select(F, absPAR, model, fla, V) %>%
+  ggplot(aes(F, absPAR)) + 
+  geom_point(aes(colour = as.factor(model))) + 
+  geom_line(aes(colour = as.factor(model))) + 
+  facet_grid(rows = vars(fla), cols = vars(V)) +
+  labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
+
+trying %>% 
+  select(F, absPAR, model, fla, L) %>%
+  filter(fla ==  0.1) %>% 
+  ggplot(aes(F, absPAR)) + 
+  geom_point(aes(colour = as.factor(model))) + 
+  geom_line(aes(colour = as.factor(model))) + 
+  facet_grid(rows = vars(fla), cols = vars(L)) +
+  labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")

@@ -50,7 +50,7 @@ create_coordinates <- function(sn = sqrt_n) {
     as.matrix()
 }
 
-create_trees <- function(path, h_mn = 10, h_cv = 0.1, LAI = 1.54, ft_h = 1.99, 
+create_trees <- function(path, h_mn = 10, h_cv = 0.1, LAI = 1.54, ft_h = 1.99, fla = 1,
                          plot_area = 20000, indivlarea = 47.62, indivrad = 5.087809/2, 
                          indivhtcrown = 6.359762, indivdiam = 0.3, seed = 6, half = 1/2) {
   wd <- setwd(path)
@@ -65,7 +65,8 @@ create_trees <- function(path, h_mn = 10, h_cv = 0.1, LAI = 1.54, ft_h = 1.99,
   SD_height_df <- replace(SD_height_df$., ft, h_mn*ft_h)
   perimeter_h <- replace_perimeter_h(ntrees, sqrt_n, indivhtcrown, h_mn)
   perimeter_r <- replace_perimeter_r(ntrees, sqrt_n, indivrad)
-  perimeter_la <- replace_perimeter_la(ntrees, sqrt_n, indivlarea)
+  perimeter_la <- replace_perimeter_la(ntrees, sqrt_n, indivlarea) %>% 
+    replace(., ft, fla)
   replacePAR("confile.dat", "itargets", "treescon", newval = ft)
   replacePAR("confile.dat", "notrees", "treescon", newval = ntrees)
   replacePAR("Trees.dat", "xycoords", "xy", newval= coordinates)

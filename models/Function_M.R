@@ -89,12 +89,12 @@ PAR_calculator_ppa <- function(data, indi_la = 47.62) {
 
 organising_results <- function(data) {
   df <- plyr::ldply(data, data.frame) %>% 
-    bind_cols(combinations) %>% 
-    select(H, V, L, F, S, name, absPAR)  %>% 
+    bind_cols(combinations_new) %>% 
+    select(H, V, L, F, fla, S, name, absPAR)  %>% 
     mutate(
       name = name %>% gsub("_S[1-3]", "",., perl = TRUE)
     ) %>% 
-    group_by(H, V, L, F, name) %>% 
+    group_by(H, V, L, F, fla, name) %>% 
     summarise_at(vars(absPAR), mean)
 }
 
@@ -115,7 +115,7 @@ deep_leaf_distribtuion <- function(httrunk, htcrown = 6.36, radx = 2.54, rady = 
     )
 }
   
-deep_crown <- function(d) {
+deep_crown_set_up <- function(d) {
   deep_crown_distribution <- 
     d$httrunk[1:nrow(d)] %>% 
     purrr::map(deep_leaf_distribtuion) 
@@ -144,7 +144,7 @@ deep_crown <- function(d) {
   }
 }
 
-df <- results %>% 
-  purrr::map(deep_crown) 
+deep_crown <- results %>% 
+  purrr::map(deep_crown_set_up) 
 
 

@@ -38,14 +38,12 @@ final_results_ppa <- organising_results(results_PAR_ppa) %>% add_column(model = 
 
 final_results <- rbind(final_results_ft, final_results_ppa)
 
-
-
-maespa <- read_csv("A.csv") 
+maespa <- read_csv("different_la.csv") 
 maespa <- maespa %>% 
-  select( H, V, L, F, name, absPAR) %>% 
+  select(H, V, L, F, fla, name, absPAR) %>% 
   add_column(model = "maespa")
 
-trying <- rbind(new_final_results_ft, maespa)
+trying <- rbind(final_results_new, maespa)
 
 trying %>% 
   select(F, absPAR, model, V, L) %>%
@@ -54,3 +52,45 @@ trying %>%
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
+
+#setting up with different focal las
+
+H <- c(15)
+V <- c(0.10)
+L <- c(2.916)
+F <- c(1.99, 1.85, 1.75, 1.60, 1.50, 1.35, 1.25, 1.15, 1.05, 1.00, 
+       0.95, 0.85, 0.75, 0.65, 0.50, 0.40, 0.25, 0.15, 0.01)
+fla <- c(0.1, 0.5, 1, 10, 50)
+S <- c(1, 2, 3)
+
+combinations_new <- expand_grid(H, V, L, F, fla, S) %>% 
+  mutate(path = sprintf("simulations_new/H%s_V%s_L%s_F%s_fla%s_S%s", H, V, L, F, fla, S)) %>% 
+  add_column(name = basename(.$path))
+
+#loading in all the trees file from MAESPA 
+results_new <- combinations_new$path[1:nrow(combinations_new)] %>% 
+  purrr::map(load_trees) 
+
+names(results_new) <- combinations_new$path[1:nrow(combinations_new)] %>% 
+  basename()
+
+#setting up the lai and light conditions for ft and ppa
+model_conditions_new <- results_new %>% 
+  purrr::map(model_simp)
+
+#working out the absPAR for the focal tree in each of the MAESPA simulations 
+results_PAR_ft_new <- model_conditions_new %>% 
+  purrr::map(PAR_calculator_ft)
+
+results_PAR_ppa_new <- model_conditions_new %>% 
+  purrr::map(PAR_calculator_ppa)
+
+#turning the list of lists into a tibble, adding combination variables and averaging the three seeds 
+final_results_ft_new <- organising_results(results_PAR_ft_new) %>% add_column(model = "FT")
+
+final_results_ppa_new <- organising_results(results_PAR_ppa_new) %>% add_column(model = "PPA")
+
+final_results_new <- rbind(final_results_ft_new, final_results_ppa_new) %>% 
+  mutate(
+    absPAR = (absPAR/47.62)*fla
+  )
