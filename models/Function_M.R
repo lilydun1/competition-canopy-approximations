@@ -23,7 +23,7 @@ load_trees <- function(path) {
     filter(x > 27.999, x < 168.001, y > 27.999, y < 168.001)
 }
 
-model_simp_f <- function(data) {
+model_simp <- function(data) {
   df <- data %>% 
     mutate(t_h = htcrown + httrunk) %>% 
     arrange(desc(t_h)) %>% 
@@ -39,8 +39,8 @@ model_simp_f <- function(data) {
     as_tibble()
 }
 
-PAR_calculator <- function(data, indi_la = 47.62) {
-  # conatnt to converts ymol/s to M J / h
+PAR_calculator_ft <- function(data, indi_la = 47.62) {
+  # constant to converts ymol/s to M J / h
   UMOLperStoMJperH <-
     3600 /  # s / hr
     4.57 /  # umol quanta / J
@@ -58,30 +58,38 @@ PAR_calculator <- function(data, indi_la = 47.62) {
       MJ_per_H = PAR  * UMOLperStoMJperH  # MJ
     )
   # integrate over the day using trapezoidal integration
-  pracma::trapz(met$time, met$MJ_per_H) * indi_la %>% as_tibble() %>% 
+  pracma::trapz(met$time, met$MJ_per_H) * indi_la %>% 
+    as_tibble() %>% 
     rename(absPAR = value)
 }
 
-combining_results_ft <- function(sim_name) {
-  df <- combinations %>% 
-    filter(name == sim_name) %>% 
-    bind_cols(results_PAR_ft[[sim_name]])
-}
-
-new_combining_results_ft <- function(sim_name) {
-  df <- combinations %>% 
-    filter(name == sim_name) %>% 
-    bind_cols(new_results_PAR_ft[[sim_name]])
-}
-
-combining_results_ppa <- function(sim_name) {
-  df <- combinations %>% 
-    filter(name == sim_name) %>% 
-    bind_cols(results_PAR_ppa[[sim_name]])
+PAR_calculator_ppa <- function(data, indi_la = 47.62) {
+  # constant to converts ymol/s to M J / h
+  UMOLperStoMJperH <-
+    3600 /  # s / hr
+    4.57 /  # umol quanta / J
+    10^6    # J / MJ
+  L_ft = data %>% 
+    filter(focal == "TRUE") %>% 
+    pull(lai_ppa) 
+  # load met and convert PAR to J/hr
+  met <- 
+    readmet(filename = "met.dat", nlines = -1) %>% 
+    as_tibble() %>% 
+    select(time = TIME, PAR) %>%
+    mutate(      
+      PAR = 0.77 * PAR * exp(-0.77*L_ft),
+      MJ_per_H = PAR  * UMOLperStoMJperH  # MJ
+    )
+  # integrate over the day using trapezoidal integration
+  df <- pracma::trapz(met$time, met$MJ_per_H) * indi_la %>% 
+    as_tibble() %>% 
+    rename(absPAR = value)
 }
 
 organising_results <- function(data) {
   df <- plyr::ldply(data, data.frame) %>% 
+    bind_cols(combinations) %>% 
     select(H, V, L, F, S, name, absPAR)  %>% 
     mutate(
       name = name %>% gsub("_S[1-3]", "",., perl = TRUE)
