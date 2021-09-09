@@ -45,7 +45,7 @@ PAR_calculator_ft <- function(data, indi_la = 47.62) {
     3600 /  # s / hr
     4.57 /  # umol quanta / J
     10^6    # J / MJ
-  L_ft = data %>% 
+  L_ft <- data %>% 
     filter(focal == "TRUE") %>% 
     pull(lai) 
   # load met and convert PAR to J/hr
@@ -93,8 +93,7 @@ organising_results <- function(data) {
     select(H, V, L, F, S, name, absPAR)  %>% 
     mutate(
       name = name %>% gsub("_S[1-3]", "",., perl = TRUE)
-    )
-  df <- df %>% 
+    ) %>% 
     group_by(H, V, L, F, name) %>% 
     summarise_at(vars(absPAR), mean)
 }

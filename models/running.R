@@ -11,45 +11,32 @@ S <- c(1, 2, 3)
 
 #setting up combinations of variables 
 combinations <- expand_grid(H, V, L, F, S) %>% 
-  mutate(path = sprintf("simulations/H%s_V%s_L%s_F%s_S%s", H, V, L, F, S))
-
-combinations_basenames <- combinations$path %>% 
-  basename()
-
-combinations <- combinations %>% 
-  add_column(name = combinations_basenames)
+  mutate(path = sprintf("simulations/H%s_V%s_L%s_F%s_S%s", H, V, L, F, S)) %>% 
+  add_column(name = basename(.$path))
 
 #loading in all the trees file from MAESPA 
 results <- combinations$path[1:nrow(combinations)] %>% 
   purrr::map(load_trees) 
-
 names(results) <- combinations$path[1:nrow(combinations)] %>% 
   basename()
 
-#setting up the lai and light conditions for ft and ppa: one with the focal tree one without
-results_f <- results %>% 
+#setting up the lai and light conditions for ft and ppa
+model_conditions <- results %>% 
   purrr::map(model_simp)
 
 #working out the absPAR for the focal tree in each of the MAESPA simulations 
-results_PAR_ft <- results_f %>% 
+results_PAR_ft <- model_conditions %>% 
   purrr::map(PAR_calculator_ft)
 
-results_PAR_ppa <- results_f %>% 
+results_PAR_ppa <- model_conditions %>% 
   purrr::map(PAR_calculator_ppa)
 
-#turning the list of lists into a tibble and averaging the three seeds 
+#turning the list of lists into a tibble, adding combination variables and averaging the three seeds 
 final_results_ft <- organising_results(results_PAR_ft) %>% add_column(model = "FT")
 
 final_results_ppa <- organising_results(results_PAR_ppa) %>% add_column(model = "PPA")
 
 final_results <- rbind(final_results_ft, final_results_ppa)
-
-
-
-
-
-
-
 
 
 
