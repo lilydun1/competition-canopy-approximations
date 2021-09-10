@@ -80,12 +80,19 @@ final_results_new <- rbind(final_results_ft_new, final_results_ppa_new) %>%
   )
 
 #maespa 
-maespa <- read_csv("different_la.csv") 
+maespa <- read_csv("A.csv") 
 maespa <- maespa %>% 
+  select(H, V, L, F, name, absPAR) %>% 
+  add_column(model = "maespa")
+
+maespa_n_others <- rbind(final_results, maespa)
+
+maespa_fla <- read_csv("different_la.csv") 
+maespa_fla <- maespa_fla %>% 
   select(H, V, L, F, fla, name, absPAR) %>% 
   add_column(model = "maespa")
 
-maespa_n_others <- rbind(final_results_new, maespa)
+maespa_n_others_fla <- rbind(final_results_new, maespa_fla)
 
 hour <- readhrflux(filename = "hrflux.dat")
 

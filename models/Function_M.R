@@ -151,7 +151,7 @@ deep_crown_set_up <- function(d) {
       filter(tree_num == 481)
   } else if(nrow(data) == 1156*50) {
     data <- data %>% 
-      filter(tree_num == 595)
+      filter(tree_num == 595)     
   }
 }
 
