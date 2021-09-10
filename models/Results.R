@@ -27,6 +27,14 @@ final_results %>%
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
 
+maespa_n_others_fla_0.1 %>% 
+  select(F, absPAR, model, V, L) %>%
+  ggplot(aes(F, absPAR)) + 
+  geom_point(aes(colour = as.factor(model))) + 
+  geom_line(aes(colour = as.factor(model))) + 
+  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
+  labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
+
 maespa_n_others %>% 
   select(F, absPAR, model, V, L) %>%
   ggplot(aes(F, absPAR)) + 
@@ -56,6 +64,7 @@ maespa_n_others_fla %>%
   facet_wrap(~fla, scales = "free", labeller = names_fla) +
   labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
 
+#filtered!
 maespa_n_others_fla %>% 
   select(F, absPAR, model, fla, L) %>%
   filter(F == 1) %>% 

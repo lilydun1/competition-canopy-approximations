@@ -14,11 +14,12 @@ mn_outputs_A %>%
   labs(x = "FT height", y = "Absorbed PAR", colour = "MAESPA") +
   scale_color_manual(values = c("#00AFBB"))
 
-mn_outputs_new %>% 
-  select(F, absPAR, fla) %>%
+mn_outputs_fla_0.1 %>% 
+  select(F, absPAR, H, V, L) %>%
   ggplot(aes(F, absPAR)) + 
   geom_point(aes(colour = as.factor(fla))) + 
   geom_line(aes(colour = as.factor(fla))) + 
+  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(x = "FT height", y = "Absorbed PAR", colour = "MAESPA")
 
 mn_outputs_WD %>% 

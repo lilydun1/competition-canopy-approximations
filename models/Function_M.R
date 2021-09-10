@@ -39,7 +39,7 @@ model_simp <- function(data) {
     as_tibble()
 }
 
-PAR_calculator_ft <- function(data, indi_la = 47.62) {
+PAR_calculator_ft <- function(data, indi_la = 1) {
   # constant to converts ymol/s to M J / h
   UMOLperStoMJperH <-
     3600 /  # s / hr
@@ -63,7 +63,7 @@ PAR_calculator_ft <- function(data, indi_la = 47.62) {
     rename(absPAR = value)
 }
 
-PAR_calculator_ppa <- function(data, indi_la = 47.62) {
+PAR_calculator_ppa <- function(data, indi_la = 1) {
   # constant to converts ymol/s to M J / h
   UMOLperStoMJperH <-
     3600 /  # s / hr
@@ -87,20 +87,9 @@ PAR_calculator_ppa <- function(data, indi_la = 47.62) {
     rename(absPAR = value)
 }
 
-organising_results <- function(data) {
+organising_results <- function(data, comb) {
   df <- plyr::ldply(data, data.frame) %>% 
-    bind_cols(combinations) %>% 
-    select(H, V, L, F, S, name, absPAR)  %>% 
-    mutate(
-      name = name %>% gsub("_S[1-3]", "",., perl = TRUE)
-    ) %>% 
-    group_by(H, V, L, F, name) %>% 
-    summarise_at(vars(absPAR), mean)
-}
-
-organising_results_new <- function(data) {
-  df <- plyr::ldply(data, data.frame) %>% 
-    bind_cols(combinations_new) %>% 
+    bind_cols(comb) %>% 
     select(H, V, L, F, fla, S, name, absPAR)  %>% 
     mutate(
       name = name %>% gsub("_S[1-3]", "",., perl = TRUE)
