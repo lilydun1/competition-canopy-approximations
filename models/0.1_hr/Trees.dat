@@ -1,0 +1,64 @@
+Example trees file.
+
+&plot
+x0 = 0
+y0 = 0
+xmax = 196
+ymax = 196
+xslope = 0
+yslope = 0
+bearing = 45
+notrees = 1
+/
+
+&aerodyn
+zht	=	30
+zpd	=	16
+z0ht	=	3
+/
+
+&xy
+xycoords =
+105.54 90.46
+/
+
+crown	radius	in	the	x-direction.
+&indivradx
+nodates = 1
+values =
+2.5439045
+/
+
+crown	radius	in	the	y-direction.
+&indivrady
+nodates = 1
+values =
+2.5439045
+/
+
+crown	height	for	each	tree.
+&indivhtcrown
+nodates = 1
+values =
+6.359762
+/
+
+stem	diameter	for	each	tree
+&indivdiam
+nodates = 1
+values = 0.3
+/
+
+trunk	height
+&indivhttrunk
+nodates = 1
+values = 15
+/
+
+leaf	area
+&indivlarea
+nodates = 1
+values =
+0.1
+/
+

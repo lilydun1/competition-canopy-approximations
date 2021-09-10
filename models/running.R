@@ -86,3 +86,7 @@ maespa <- maespa %>%
   add_column(model = "maespa")
 
 maespa_n_others <- rbind(final_results_new, maespa)
+
+hour <- readhrflux(filename = "hrflux.dat")
+
+
