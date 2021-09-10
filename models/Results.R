@@ -27,19 +27,32 @@ final_results %>%
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
 
+names_fla <- as_labeller(
+  c(`0.1` = "f_la 0.1", `0.5` = "f_la 0.5", `1` = "f_la 1", 
+    `10` = "f_la 10", `50` = "f_la 50")
+)
+
 final_results_new %>% 
-  select(F, absPAR, model, fla, V) %>%
+  select(F, absPAR, model, fla, L) %>%
   ggplot(aes(F, absPAR)) + 
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
-  facet_grid(rows = vars(fla), cols = vars(V)) +
+  facet_wrap(~fla, scales = "free", labeller = names_fla) +
   labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
 
-trying %>% 
+maespa_n_others %>% 
   select(F, absPAR, model, fla, L) %>%
-  filter(fla ==  0.1) %>% 
   ggplot(aes(F, absPAR)) + 
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
-  facet_grid(rows = vars(fla), cols = vars(L)) +
+  facet_wrap(~fla, scales = "free", labeller = names_fla) +
+  labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
+
+maespa_n_others %>% 
+  select(F, absPAR, model, fla, L) %>%
+  filter(F == 1) %>% 
+  ggplot(aes(F, absPAR)) + 
+  geom_point(aes(colour = as.factor(model))) + 
+  geom_line(aes(colour = as.factor(model))) + 
+  facet_wrap(~fla, scales = "free", labeller = names_fla) +
   labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")

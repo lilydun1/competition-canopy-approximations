@@ -38,23 +38,7 @@ final_results_ppa <- organising_results(results_PAR_ppa) %>% add_column(model = 
 
 final_results <- rbind(final_results_ft, final_results_ppa)
 
-maespa <- read_csv("different_la.csv") 
-maespa <- maespa %>% 
-  select(H, V, L, F, fla, name, absPAR) %>% 
-  add_column(model = "maespa")
-
-trying <- rbind(final_results_new, maespa)
-
-trying %>% 
-  select(F, absPAR, model, V, L) %>%
-  ggplot(aes(F, absPAR)) + 
-  geom_point(aes(colour = as.factor(model))) + 
-  geom_line(aes(colour = as.factor(model))) + 
-  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
-
 #setting up with different focal las
-
 H <- c(15)
 V <- c(0.10)
 L <- c(2.916)
@@ -86,11 +70,19 @@ results_PAR_ppa_new <- model_conditions_new %>%
   purrr::map(PAR_calculator_ppa)
 
 #turning the list of lists into a tibble, adding combination variables and averaging the three seeds 
-final_results_ft_new <- organising_results(results_PAR_ft_new) %>% add_column(model = "FT")
+final_results_ft_new <- organising_results_new(results_PAR_ft_new) %>% add_column(model = "FT")
 
-final_results_ppa_new <- organising_results(results_PAR_ppa_new) %>% add_column(model = "PPA")
+final_results_ppa_new <- organising_results_new(results_PAR_ppa_new) %>% add_column(model = "PPA")
 
 final_results_new <- rbind(final_results_ft_new, final_results_ppa_new) %>% 
   mutate(
     absPAR = (absPAR/47.62)*fla
   )
+
+#maespa 
+maespa <- read_csv("different_la.csv") 
+maespa <- maespa %>% 
+  select(H, V, L, F, fla, name, absPAR) %>% 
+  add_column(model = "maespa")
+
+maespa_n_others <- rbind(final_results_new, maespa)

@@ -89,6 +89,17 @@ PAR_calculator_ppa <- function(data, indi_la = 47.62) {
 
 organising_results <- function(data) {
   df <- plyr::ldply(data, data.frame) %>% 
+    bind_cols(combinations) %>% 
+    select(H, V, L, F, S, name, absPAR)  %>% 
+    mutate(
+      name = name %>% gsub("_S[1-3]", "",., perl = TRUE)
+    ) %>% 
+    group_by(H, V, L, F, name) %>% 
+    summarise_at(vars(absPAR), mean)
+}
+
+organising_results_new <- function(data) {
+  df <- plyr::ldply(data, data.frame) %>% 
     bind_cols(combinations_new) %>% 
     select(H, V, L, F, fla, S, name, absPAR)  %>% 
     mutate(
