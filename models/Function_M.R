@@ -39,6 +39,8 @@ model_simp <- function(data) {
     as_tibble()
 }
 
+#need to add option of two stream 
+
 PAR_calculator_ft <- function(data, indi_la = 1) {
   # constant to converts ymol/s to M J / h
   UMOLperStoMJperH <-
