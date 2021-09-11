@@ -76,28 +76,31 @@ V <- c(0.00, 0.10, 0.25, 0.50)
 L <- c(0.466, 1.488, 2.916, 4.402, 5.485)
 F <- c(1.99, 1.85, 1.75, 1.60, 1.50, 1.35, 1.25, 1.15, 1.05, 1.00, 
        0.95, 0.85, 0.75, 0.65, 0.50, 0.40, 0.25, 0.15, 0.01)
+fla <- c(47.62)
 S <- c(1, 2, 3)
 
-combinations_A <- expand_grid(H, V, L, F, S) %>% 
-  mutate(path = sprintf("simulations_A/H%s_V%s_L%s_F%s_S%s", H, V, L, F, S))
+combinations_fla_47.62 <- expand_grid(H, V, L, F, fla, S) %>% 
+  mutate(path = sprintf("simulations_fla_47.62/H%s_V%s_L%s_F%s_fla%s_S%s", H, V, L, F, fla, S))
 
-for(i in 1:nrow(combinations_A)) {
-  create_simulation(path = combinations_A$path[i], template = "template_A", h_mn = combinations_A$H[i], h_cv = combinations_A$V[i], 
-                    LAI = combinations_A$L[i], ft_h = combinations_A$F[i], seed = combinations_A$S[i])
+for(i in 1:nrow(combinations_fla_47.62)) {
+  create_simulation(path = combinations_fla_47.62$path[i], template = "template_A", 
+                    h_mn = combinations_fla_47.62$H[i], h_cv = combinations_fla_47.62$V[i], 
+                    LAI = combinations_fla_47.62$L[i], ft_h = combinations_fla_47.62$F[i], 
+                    fla = combinations_fla_47.62$fla[i], seed = combinations_fla_47.62$S[i])
 }
 
-for(i in 1:nrow(combinations_A)) {
-  run_simulation(path = combinations_A$path[i])
+for(i in 1:nrow(combinations_fla_47.62)) {
+  run_simulation(path = combinations_fla_47.62$path[i])
 }
 
-output_A <- combinations_A$path %>% 
+output_fla_47.62 <- combinations_fla_47.62$path %>% 
   purrr:: map_df(load_output)
 
-output_combined_A <- combinations_A %>% 
-  left_join(output_A, by = "path")
+output_combined_fla_47.62 <- combinations_fla_47.62 %>% 
+  left_join(output_fla_47.62, by = "path")
 
-mn_outputs_A <- output_combined_A %>% 
-  group_by(H, V, L, F, Tree, name) %>% 
+mn_outputs_fla_47.62 <- output_combined_fla_47.62 %>% 
+  group_by(H, V, L, F, fla, Tree, name) %>% 
   summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean) 
 
 #wet and dry 

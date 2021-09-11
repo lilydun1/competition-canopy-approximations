@@ -57,34 +57,34 @@ F <- c(1.99, 1.85, 1.75, 1.60, 1.50, 1.35, 1.25, 1.15, 1.05, 1.00,
 fla <- c(47.62)
 S <- c(1, 2, 3)
 
-combinations <- expand_grid(H, V, L, F, S) %>% 
-  mutate(path = sprintf("simulations/H%s_V%s_L%s_F%s_S%s", H, V, L, F, S)) %>% 
+combinations_fla_47.62 <- expand_grid(H, V, L, F, fla, S) %>% 
+  mutate(path = sprintf("simulations_fla_47.62/H%s_V%s_L%s_F%s_fla%s_S%s", H, V, L, F, fla, S)) %>% 
   add_column(name = basename(.$path))
 
-results <- combinations$path[1:nrow(combinations)] %>% 
+results_fla_47.62 <- combinations_fla_47.62$path[1:nrow(combinations_fla_47.62)] %>% 
   purrr::map(load_trees) 
-names(results) <- combinations$path[1:nrow(combinations)] %>% 
+names(results_fla_47.62) <- combinations_fla_47.62$path[1:nrow(combinations_fla_47.62)] %>% 
   basename()
 
-model_conditions <- results %>% 
+model_conditions_fla_47.62 <- results_fla_47.62 %>% 
   purrr::map(model_simp)
 
-results_PAR_ft <- model_conditions %>% 
+results_PAR_ft_fla_47.62 <- model_conditions_fla_47.62 %>% 
   purrr::map(PAR_calculator_ft)
 
-results_PAR_ppa <- model_conditions %>% 
+results_PAR_ppa_fla_47.62 <- model_conditions_fla_47.62 %>% 
   purrr::map(PAR_calculator_ppa)
 
-final_results_ft <- organising_results(results_PAR_ft, combinations) %>% 
-  add_column(model = "FT")
+final_results_ft_fla_47.62 <- organising_results(results_PAR_ft_fla_47.62, combinations_fla_47.62) %>% 
+  add_column(model = "FT") 
 
-final_results_ppa <- organising_results(results_PAR_ppa, combinations) %>% 
-  add_column(model = "PPA")
+final_results_ppa_fla_47.62 <- organising_results(results_PAR_ppa_fla_47.62, combinations_fla_47.62) %>% 
+  add_column(model = "PPA") 
 
-final_results <- rbind(final_results_ft, final_results_ppa) #%>%  
-  #mutate(
-  #absPAR = absPAR*fla
-#)
+final_results_fla_47.62 <- rbind(final_results_ft_fla_47.62, final_results_ppa_fla_47.62) %>%  
+  mutate(
+  absPAR = absPAR*fla
+)
 
 maespa_fla_47.62 <- read_csv("maespa_fla_47.62.csv") 
 maespa_fla_47.62 <- maespa_fla_47.62 %>% 
@@ -92,7 +92,6 @@ maespa_fla_47.62 <- maespa_fla_47.62 %>%
   add_column(model = "maespa")
 
 maespa_n_others_fla_47.62 <- rbind(final_results, maespa_fla_47.62)
-
 
 #setting up with different focal las
 H <- c(15)
@@ -103,32 +102,32 @@ F <- c(1.99, 1.85, 1.75, 1.60, 1.50, 1.35, 1.25, 1.15, 1.05, 1.00,
 fla <- c(0.1, 0.5, 1, 10, 50)
 S <- c(1, 2, 3)
 
-combinations_new <- expand_grid(H, V, L, F, fla, S) %>% 
-  mutate(path = sprintf("simulations_new/H%s_V%s_L%s_F%s_fla%s_S%s", H, V, L, F, fla, S)) %>% 
+combinations_c_fla <- expand_grid(H, V, L, F, fla, S) %>% 
+  mutate(path = sprintf("simulations_c_fla/H%s_V%s_L%s_F%s_fla%s_S%s", H, V, L, F, fla, S)) %>% 
   add_column(name = basename(.$path))
 
-results_new <- combinations_new$path[1:nrow(combinations_new)] %>% 
+results_c_fla <- combinations_c_fla$path[1:nrow(combinations_c_fla)] %>% 
   purrr::map(load_trees) 
 
-names(results_new) <- combinations_new$path[1:nrow(combinations_new)] %>% 
+names(results_c_fla) <- combinations_c_fla$path[1:nrow(combinations_c_fla)] %>% 
   basename()
 
-model_conditions_new <- results_new %>% 
+model_conditions_c_fla <- results_c_fla %>% 
   purrr::map(model_simp)
 
-results_PAR_ft_new <- model_conditions_new %>% 
+results_PAR_ft_c_fla <- model_conditions_c_fla %>% 
   purrr::map(PAR_calculator_ft)
 
-results_PAR_ppa_new <- model_conditions_new %>% 
+results_PAR_ppa_c_fla <- model_conditions_c_fla %>% 
   purrr::map(PAR_calculator_ppa)
 
-final_results_ft_new <- organising_results_new(results_PAR_ft_new, combinations_new) %>% 
+final_results_ft_c_fla <- organising_results(results_PAR_ft_c_fla, combinations_c_fla) %>% 
   add_column(model = "FT")
 
-final_results_ppa_new <- organising_results_new(results_PAR_ppa_new, combinations_new) %>% 
+final_results_ppa_c_fla <- organising_results(results_PAR_ppa_c_fla, combinations_c_fla) %>% 
   add_column(model = "PPA")
 
-final_results_new <- rbind(final_results_ft_new, final_results_ppa_new) %>% 
+final_results_c_fla <- rbind(final_results_ft_c_fla, final_results_ppa_c_fla) %>% 
   mutate(
     absPAR = absPAR*fla
   )
@@ -138,7 +137,7 @@ maespa_c_fla <- maespa_c_fla %>%
   select(H, V, L, F, fla, name, absPAR) %>% 
   add_column(model = "maespa")
 
-maespa_n_others_c_fla <- rbind(final_results_new, maespa_c_fla)
+maespa_n_others_c_fla <- rbind(final_results_c_fla, maespa_c_fla)
 
 
 hour <- readhrflux(filename = "hrflux.dat")
