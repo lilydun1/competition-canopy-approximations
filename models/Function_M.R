@@ -39,9 +39,60 @@ model_simp <- function(data) {
     as_tibble()
 }
 
-#need to add option of two stream 
-
+#new 
 PAR_calculator_ft <- function(data, indi_la = 1) {
+  # constant to converts ymol/s to M J / h
+  UMOLperStoMJperH <-
+    3600 /  # s / hr
+    4.57 /  # umol quanta / J
+    10^6    # J / MJ
+  L_ft <- data %>% 
+    filter(focal == "TRUE") %>% 
+    pull(lai) 
+  # load met and convert PAR to J/hr
+  met <- 
+    readmet(filename = "met.dat", nlines = -1) %>% 
+    as_tibble() %>% 
+    select(time = TIME, PAR) %>%
+    mutate(      
+      PAR_one_s = 0.77 * PAR * exp(-0.77*L_ft),
+      PAR_two_s = 0.77 * PAR * exp(-0.77*L_ft)*(2 - exp(-0.77*L_ft)), 
+      MJ_per_H_one_s = PAR_one_s * UMOLperStoMJperH, 
+      MJ_per_H_two_s = PAR_two_s * UMOLperStoMJperH  # MJ
+    )
+  # integrate over the day using trapezoidal integration
+  tibble(absPAR_one_s = pracma::trapz(met$time, met$MJ_per_H_one_s) * indi_la, 
+         absPAR_two_s = pracma::trapz(met$time, met$MJ_per_H_two_s) * indi_la) 
+}
+
+#new
+PAR_calculator_ppa <- function(data, indi_la = 1) {
+  # constant to converts ymol/s to M J / h
+  UMOLperStoMJperH <-
+    3600 /  # s / hr
+    4.57 /  # umol quanta / J
+    10^6    # J / MJ
+  L_ft <- data %>% 
+    filter(focal == "TRUE") %>% 
+    pull(lai_ppa) 
+  # load met and convert PAR to J/hr
+  met <- 
+    readmet(filename = "met.dat", nlines = -1) %>% 
+    as_tibble() %>% 
+    select(time = TIME, PAR) %>%
+    mutate(      
+      PAR_one_s = 0.77 * PAR * exp(-0.77*L_ft),
+      PAR_two_s = 0.77 * PAR * exp(-0.77*L_ft)*(2 - exp(-0.77*L_ft)), 
+      MJ_per_H_one_s = PAR_one_s * UMOLperStoMJperH, 
+      MJ_per_H_two_s = PAR_two_s * UMOLperStoMJperH  # MJ
+    )
+  # integrate over the day using trapezoidal integration
+  tibble(absPAR_one_s = pracma::trapz(met$time, met$MJ_per_H_one_s) * indi_la, 
+         absPAR_two_s = pracma::trapz(met$time, met$MJ_per_H_two_s) * indi_la) 
+}
+
+#old
+old_PAR_calculator_ft <- function(data, indi_la = 1) {
   # constant to converts ymol/s to M J / h
   UMOLperStoMJperH <-
     3600 /  # s / hr
@@ -65,7 +116,8 @@ PAR_calculator_ft <- function(data, indi_la = 1) {
     rename(absPAR = value)
 }
 
-PAR_calculator_ppa <- function(data, indi_la = 1) {
+#old 
+old_PAR_calculator_ppa <- function(data, indi_la = 1) {
   # constant to converts ymol/s to M J / h
   UMOLperStoMJperH <-
     3600 /  # s / hr
@@ -92,12 +144,12 @@ PAR_calculator_ppa <- function(data, indi_la = 1) {
 organising_results <- function(data, comb) {
   df <- plyr::ldply(data, data.frame) %>% 
     bind_cols(comb) %>% 
-    select(H, V, L, F, fla, S, name, absPAR)  %>% 
+    select(H, V, L, F, fla, S, name, absPAR_one_s, absPAR_two_s)  %>% 
     mutate(
       name = name %>% gsub("_S[1-3]", "",., perl = TRUE)
     ) %>% 
     group_by(H, V, L, F, fla, name) %>% 
-    summarise_at(vars(absPAR), mean)
+    summarise_at(vars(absPAR_one_s, absPAR_two_s), mean)
 }
 
 deep_leaf_distribtuion <- function(httrunk, htcrown = 6.36, radx = 2.54, rady = 2.54, 

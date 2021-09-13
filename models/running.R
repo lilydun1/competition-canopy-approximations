@@ -38,12 +38,17 @@ final_results_ppa_fla_0.1 <- organising_results(results_PAR_ppa_fla_0.1, combina
 
 final_results_fla_0.1 <- rbind(final_results_ft_fla_0.1, final_results_ppa_fla_0.1) %>% 
   mutate(
-    absPAR = absPAR*fla
+    absPAR_one_s =  absPAR_one_s*fla, 
+    absPAR_two_s = absPAR_two_s*fla
   )
 
 maespa_fla_0.1 <- read_csv("maespa_fla_0.1.csv") 
 maespa_fla_0.1 <- maespa_fla_0.1 %>% 
-  select(H, V, L, F, name, absPAR) %>% 
+  mutate(
+    absPAR_two_s = absPAR,
+    absPAR_one_s = absPAR
+  ) %>% 
+  select(H, V, L, F, name, absPAR_one_s, absPAR_two_s) %>% 
   add_column(model = "maespa")
 
 maespa_n_others_fla_0.1 <- rbind(final_results_fla_0.1, maespa_fla_0.1)

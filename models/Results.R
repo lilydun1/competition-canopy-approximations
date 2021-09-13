@@ -3,15 +3,15 @@ names <- as_labeller(
     `0.466` = "LAI 0.467", `1.488`= "LAI 1.349", `2.916`= "LAI 2.917", `4.402`= "LAI 4.485", `5.485`= "LAI 5.395")
 )
 
-maespa_n_others_fla_47.62 %>% 
-  select(F, absPAR, model, V, L) %>%
-  ggplot(aes(F, absPAR)) + 
+maespa_n_others_fla_0.1 %>% 
+  select(F, absPAR_two_s, model, V, L) %>%
+  ggplot(aes(F, absPAR_two_s)) + 
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
 
-maespa_n_others_fla_0.1 %>% 
+maespa_n_others_fla_47.62 %>% 
   select(F, absPAR, model, V, L) %>%
   ggplot(aes(F, absPAR)) + 
   geom_point(aes(colour = as.factor(model))) + 
