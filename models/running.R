@@ -88,15 +88,19 @@ final_results_ppa_fla_47.62 <- organising_results(results_PAR_ppa_fla_47.62, com
 
 final_results_fla_47.62 <- rbind(final_results_ft_fla_47.62, final_results_ppa_fla_47.62) %>%  
   mutate(
-  absPAR = absPAR*fla
+    absPAR_one_s =  absPAR_one_s*fla, 
+    absPAR_two_s = absPAR_two_s*fla
 )
 
 maespa_fla_47.62 <- read_csv("maespa_fla_47.62.csv") 
 maespa_fla_47.62 <- maespa_fla_47.62 %>% 
-  select(H, V, L, F, name, absPAR) %>% 
+  mutate(
+  absPAR_two_s = absPAR,
+  absPAR_one_s = absPAR) %>% 
+  select(H, V, L, F, name, absPAR_one_s, absPAR_two_s) %>% 
   add_column(model = "maespa")
 
-maespa_n_others_fla_47.62 <- rbind(final_results, maespa_fla_47.62)
+maespa_n_others_fla_47.62 <- rbind(final_results_fla_47.62, maespa_fla_47.62)
 
 #setting up with different focal las
 H <- c(15)
@@ -134,16 +138,19 @@ final_results_ppa_c_fla <- organising_results(results_PAR_ppa_c_fla, combination
 
 final_results_c_fla <- rbind(final_results_ft_c_fla, final_results_ppa_c_fla) %>% 
   mutate(
-    absPAR = absPAR*fla
+    absPAR_one_s =  absPAR_one_s*fla, 
+    absPAR_two_s = absPAR_two_s*fla
   )
 
 maespa_c_fla <- read_csv("maespa_c_fla.csv") 
 maespa_c_fla <- maespa_c_fla %>% 
-  select(H, V, L, F, fla, name, absPAR) %>% 
+  mutate(
+    absPAR_two_s = absPAR,
+    absPAR_one_s = absPAR) %>% 
+  select(H, V, L, F, fla, name, absPAR_one_s, absPAR_two_s) %>% 
   add_column(model = "maespa")
 
 maespa_n_others_c_fla <- rbind(final_results_c_fla, maespa_c_fla)
-
 
 hour <- readhrflux(filename = "hrflux.dat")
 

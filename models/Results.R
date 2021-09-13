@@ -9,15 +9,23 @@ maespa_n_others_fla_0.1 %>%
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
+  labs(title = "two stream", x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
 
-maespa_n_others_fla_47.62 %>% 
-  select(F, absPAR, model, V, L) %>%
-  ggplot(aes(F, absPAR)) + 
+maespa_n_others_fla_0.1 %>% 
+  select(F, absPAR_one_s, model, V, L) %>%
+  ggplot(aes(F, absPAR_one_s)) + 
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
+  labs(title = "one stream", x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
+
+maespa_n_others_fla_47.62 %>% 
+  select(F, absPAR_two_s, model, V, L) %>%
+  ggplot(aes(F, absPAR_two_s)) + 
+  geom_point(aes(colour = as.factor(model))) + 
+  geom_line(aes(colour = as.factor(model))) + 
+  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
+  labs(title = "no self-shading", x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
 
 names_fla <- as_labeller(
   c(`0.1` = "f_la 0.1", `0.5` = "f_la 0.5", `1` = "f_la 1", 
@@ -25,8 +33,8 @@ names_fla <- as_labeller(
 )
 
 maespa_n_others_c_fla %>% 
-  select(F, absPAR, model, fla, L) %>%
-  ggplot(aes(F, absPAR)) + 
+  select(F, absPAR_two_s, model, fla, L) %>%
+  ggplot(aes(F, absPAR_two_s)) + 
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_wrap(~fla, scales = "free", labeller = names_fla) +
