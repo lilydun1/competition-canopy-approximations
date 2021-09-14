@@ -4,12 +4,12 @@ names <- as_labeller(
 )
 
 maespa_n_others_fla_0.1 %>% 
-  select(F, absPAR_two_s, model, V, L) %>%
+  select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
   ggplot(aes(F, absPAR_two_s)) + 
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(title = "two stream", x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
+  labs(title = "two stream", x = "Focal tree height", y = "Absorbed PAR", colour = "Model") 
 
 maespa_n_others_fla_0.1 %>% 
   select(F, absPAR_one_s, model, V, L) %>%

@@ -103,6 +103,7 @@ mn_outputs_fla_47.62 <- output_combined_fla_47.62 %>%
   group_by(H, V, L, F, fla, Tree, name) %>% 
   summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean) 
 
+
 #wet and dry 
 H <- c(15)
 V <- c(0.10, 0.25)

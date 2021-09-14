@@ -39,7 +39,6 @@ model_simp <- function(data) {
     as_tibble()
 }
 
-#new 
 PAR_calculator_ft <- function(data, indi_la = 1) {
   # constant to converts ymol/s to M J / h
   UMOLperStoMJperH <-
@@ -56,7 +55,7 @@ PAR_calculator_ft <- function(data, indi_la = 1) {
     select(time = TIME, PAR) %>%
     mutate(      
       PAR_one_s = 0.77 * PAR * exp(-0.77*L_ft),
-      PAR_two_s = 0.77 * PAR * exp(-0.77*L_ft)*(2 - exp(-0.77*L_ft)), 
+      PAR_two_s = 0.77*PAR*(exp(-0.77*L_ft) + (1- exp(-0.77*L_ft))*exp(-0.4*L_ft)), 
       MJ_per_H_one_s = PAR_one_s * UMOLperStoMJperH, 
       MJ_per_H_two_s = PAR_two_s * UMOLperStoMJperH  # MJ
     )
@@ -65,7 +64,6 @@ PAR_calculator_ft <- function(data, indi_la = 1) {
          absPAR_two_s = pracma::trapz(met$time, met$MJ_per_H_two_s) * indi_la) 
 }
 
-#new
 PAR_calculator_ppa <- function(data, indi_la = 1) {
   # constant to converts ymol/s to M J / h
   UMOLperStoMJperH <-
@@ -82,63 +80,13 @@ PAR_calculator_ppa <- function(data, indi_la = 1) {
     select(time = TIME, PAR) %>%
     mutate(      
       PAR_one_s = 0.77 * PAR * exp(-0.77*L_ft),
-      PAR_two_s = 0.77 * PAR * exp(-0.77*L_ft)*(2 - exp(-0.77*L_ft)), 
+      PAR_two_s = 0.77*PAR*(exp(-0.77*L_ft) + (1- exp(-0.77*L_ft))*exp(-0.4*L_ft)), 
       MJ_per_H_one_s = PAR_one_s * UMOLperStoMJperH, 
       MJ_per_H_two_s = PAR_two_s * UMOLperStoMJperH  # MJ
     )
   # integrate over the day using trapezoidal integration
   tibble(absPAR_one_s = pracma::trapz(met$time, met$MJ_per_H_one_s) * indi_la, 
          absPAR_two_s = pracma::trapz(met$time, met$MJ_per_H_two_s) * indi_la) 
-}
-
-#old
-old_PAR_calculator_ft <- function(data, indi_la = 1) {
-  # constant to converts ymol/s to M J / h
-  UMOLperStoMJperH <-
-    3600 /  # s / hr
-    4.57 /  # umol quanta / J
-    10^6    # J / MJ
-  L_ft <- data %>% 
-    filter(focal == "TRUE") %>% 
-    pull(lai) 
-  # load met and convert PAR to J/hr
-  met <- 
-    readmet(filename = "met.dat", nlines = -1) %>% 
-    as_tibble() %>% 
-    select(time = TIME, PAR) %>%
-    mutate(      
-      PAR = 0.77 * PAR * exp(-0.77*L_ft),
-      MJ_per_H = PAR  * UMOLperStoMJperH  # MJ
-    )
-  # integrate over the day using trapezoidal integration
-  pracma::trapz(met$time, met$MJ_per_H) * indi_la %>% 
-    as_tibble() %>% 
-    rename(absPAR = value)
-}
-
-#old 
-old_PAR_calculator_ppa <- function(data, indi_la = 1) {
-  # constant to converts ymol/s to M J / h
-  UMOLperStoMJperH <-
-    3600 /  # s / hr
-    4.57 /  # umol quanta / J
-    10^6    # J / MJ
-  L_ft = data %>% 
-    filter(focal == "TRUE") %>% 
-    pull(lai_ppa) 
-  # load met and convert PAR to J/hr
-  met <- 
-    readmet(filename = "met.dat", nlines = -1) %>% 
-    as_tibble() %>% 
-    select(time = TIME, PAR) %>%
-    mutate(      
-      PAR = 0.77 * PAR * exp(-0.77*L_ft),
-      MJ_per_H = PAR  * UMOLperStoMJperH  # MJ
-    )
-  # integrate over the day using trapezoidal integration
-  df <- pracma::trapz(met$time, met$MJ_per_H) * indi_la %>% 
-    as_tibble() %>% 
-    rename(absPAR = value)
 }
 
 organising_results <- function(data, comb) {
@@ -168,7 +116,7 @@ deep_leaf_distribtuion <- function(httrunk, htcrown = 6.36, radx = 2.54, rady = 
     larea = larea*slice_volume_frac
     )
 }
-  
+
 deep_crown_set_up <- function(d) {
   deep_crown_distribution <- 
     d$httrunk[1:nrow(d)] %>% 
@@ -198,7 +146,32 @@ deep_crown_set_up <- function(d) {
   }
 }
 
-deep_crown <- results %>% 
+deep_crown <- results_fla_0.1 %>% 
   purrr::map(deep_crown_set_up) 
 
+PAR_calculator_DC <- function(la) {
+  UMOLperStoMJperH <-
+    3600 /  # s / hr
+    4.57 /  # umol quanta / J
+    10^6    # J / MJ
+  met <- readmet(filename = "met.dat", nlines = -1) %>% 
+    as_tibble() %>% 
+    select(time = TIME, PAR) %>% 
+    mutate(  
+      PAR_one_s = 0.77 * PAR * exp(-0.77*la),
+      PAR_two_s = 0.77* PAR*(exp(-0.77*la) + (1- exp(-0.77*la))*exp(-0.4*la)), 
+      MJ_per_H_one_s = PAR_one_s * UMOLperStoMJperH, 
+      MJ_per_H_two_s = PAR_two_s * UMOLperStoMJperH )
+  tibble(absPAR_one_s = pracma::trapz(met$time, met$MJ_per_H_one_s) * 0.1, 
+         absPAR_two_s = pracma::trapz(met$time, met$MJ_per_H_two_s) * 0.1) 
+}
+
+applying_DC <- function(data) {
+  data$la[1:nrow(data)] %>% 
+  purrr::map(PAR_calculator_DC) %>% 
+  plyr::ldply(., data.frame) 
+}
+
+slices_DC_absPAR <- deep_crown %>% 
+  purrr::map(applying_DC) 
 

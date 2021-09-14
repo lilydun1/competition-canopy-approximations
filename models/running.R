@@ -17,7 +17,6 @@ combinations_fla_0.1 <- expand_grid(H, V, L, F, fla, S) %>%
 
 results_fla_0.1 <- combinations_fla_0.1$path[1:nrow(combinations_fla_0.1)] %>% 
   purrr::map(load_trees) 
-
 names(results_fla_0.1) <- combinations_fla_0.1$path[1:nrow(combinations_fla_0.1)] %>% 
   basename()
 
@@ -48,7 +47,7 @@ maespa_fla_0.1 <- maespa_fla_0.1 %>%
     absPAR_two_s = absPAR,
     absPAR_one_s = absPAR
   ) %>% 
-  select(H, V, L, F, name, absPAR_one_s, absPAR_two_s) %>% 
+  select(H, V, L, F, fla, name, absPAR_one_s, absPAR_two_s) %>% 
   add_column(model = "maespa")
 
 maespa_n_others_fla_0.1 <- rbind(final_results_fla_0.1, maespa_fla_0.1)
@@ -97,7 +96,7 @@ maespa_fla_47.62 <- maespa_fla_47.62 %>%
   mutate(
   absPAR_two_s = absPAR,
   absPAR_one_s = absPAR) %>% 
-  select(H, V, L, F, name, absPAR_one_s, absPAR_two_s) %>% 
+  select(H, V, L, F, fla, name, absPAR_one_s, absPAR_two_s) %>% 
   add_column(model = "maespa")
 
 maespa_n_others_fla_47.62 <- rbind(final_results_fla_47.62, maespa_fla_47.62)
