@@ -92,7 +92,7 @@ PAR_calculator_ppa <- function(data, indi_la = 1) {
 organising_results <- function(data, comb) {
   df <- plyr::ldply(data, data.frame) %>% 
     bind_cols(comb) %>% 
-    select(H, V, L, F, fla, S, name, absPAR_one_s, absPAR_two_s)  %>% 
+    select(H, V, L, F, fla, S, name, absPAR_one_s, absPAR_two_s) %>% 
     mutate(
       name = name %>% gsub("_S[1-3]", "",., perl = TRUE)
     ) %>% 
@@ -175,3 +175,18 @@ applying_DC <- function(data) {
 slices_DC_absPAR <- deep_crown %>% 
   purrr::map(applying_DC) 
 
+mean_DC <- function(data) {
+  data %>% 
+  summarise(
+    absPAR_one_s = mean(absPAR_one_s), 
+    absPAR_two_s = mean(absPAR_two_s)
+  )
+}
+
+final_results_DC_fla_0.1 <- slices_DC_absPAR %>% 
+  purrr::map(mean_DC) 
+
+final_results_DC_fla_0.1 <- organising_results(final_results_DC_fla_0.1, combinations_fla_0.1) %>% 
+  add_column(model = "DC")
+  
+  

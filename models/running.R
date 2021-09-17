@@ -41,6 +41,8 @@ final_results_fla_0.1 <- rbind(final_results_ft_fla_0.1, final_results_ppa_fla_0
     absPAR_two_s = absPAR_two_s*fla
   )
 
+final_results_fla_0.1 <- rbind(final_results_fla_0.1, final_results_DC_fla_0.1)
+
 maespa_fla_0.1 <- read_csv("maespa_fla_0.1.csv") 
 maespa_fla_0.1 <- maespa_fla_0.1 %>% 
   mutate(
