@@ -183,7 +183,8 @@ mean_DC <- function(data) {
   )
 }
 
-final_results_DC_fla_0.1 <- slices_DC_absPAR %>% 
+final_results_DC_fla_0.1 <- 
+  slices_DC_absPAR %>% 
   purrr::map(mean_DC) 
 
 final_results_DC_fla_0.1 <- organising_results(final_results_DC_fla_0.1, combinations_fla_0.1) %>% 
