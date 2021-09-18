@@ -146,9 +146,6 @@ deep_crown_set_up <- function(d) {
   }
 }
 
-deep_crown <- results_fla_0.1 %>% 
-  purrr::map(deep_crown_set_up) 
-
 PAR_calculator_DC <- function(la) {
   UMOLperStoMJperH <-
     3600 /  # s / hr
@@ -172,22 +169,17 @@ applying_DC <- function(data) {
   plyr::ldply(., data.frame) 
 }
 
-slices_DC_absPAR <- deep_crown %>% 
-  purrr::map(applying_DC) 
-
-mean_DC <- function(data) {
+summarise_DC <- function(data) {
+  d <- deep_leaf_distribtuion(results_fla_0.1[[1]]$httrunk[[1]]) %>% 
+    mutate(larea = (larea/47.62)*0.1)
   data %>% 
-  summarise(
-    absPAR_one_s = mean(absPAR_one_s), 
-    absPAR_two_s = mean(absPAR_two_s)
+    mutate(
+    absPAR_one_s = absPAR_one_s*d$larea, 
+    absPAR_two_s = absPAR_two_s*d$larea
+  ) %>% 
+    summarise(
+    absPAR_one_s = sum(absPAR_one_s), 
+    absPAR_two_s = sum(absPAR_two_s)
   )
 }
-
-final_results_DC_fla_0.1 <- 
-  slices_DC_absPAR %>% 
-  purrr::map(mean_DC) 
-
-final_results_DC_fla_0.1 <- organising_results(final_results_DC_fla_0.1, combinations_fla_0.1) %>% 
-  add_column(model = "DC")
-  
   

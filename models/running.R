@@ -30,18 +30,31 @@ results_PAR_ppa_fla_0.1 <- model_conditions_fla_0.1 %>%
   purrr::map(PAR_calculator_ppa)
 
 final_results_ft_fla_0.1 <- organising_results(results_PAR_ft_fla_0.1, combinations_fla_0.1) %>% 
-  add_column(model = "FT")
+  add_column(model = "FLAT TOP")
 
 final_results_ppa_fla_0.1 <- organising_results(results_PAR_ppa_fla_0.1, combinations_fla_0.1) %>% 
   add_column(model = "PPA")
 
-final_results_fla_0.1 <- rbind(final_results_ft_fla_0.1, final_results_ppa_fla_0.1) %>% 
+final_results_ft_ppa_fla_0.1 <- rbind(final_results_ft_fla_0.1, final_results_ppa_fla_0.1) %>% 
   mutate(
     absPAR_one_s =  absPAR_one_s*fla, 
     absPAR_two_s = absPAR_two_s*fla
   )
 
-final_results_fla_0.1 <- rbind(final_results_fla_0.1, final_results_DC_fla_0.1)
+deep_crown <- results_fla_0.1 %>% 
+  purrr::map(deep_crown_set_up) 
+
+slices_DC_absPAR <- deep_crown %>% 
+  purrr::map(applying_DC) 
+
+summarised_DC_results <- 
+  slices_DC_absPAR %>% 
+  purrr::map(summarise_DC) 
+
+final_results_DC_fla_0.1 <- organising_results(summarised_DC_results, combinations_fla_0.1) %>% 
+  add_column(model = "DEEP CROWN")
+
+final_results_fla_0.1 <- rbind(final_results_fla_0.1, final_results_ft_ppa_fla_0.1)
 
 maespa_fla_0.1 <- read_csv("maespa_fla_0.1.csv") 
 maespa_fla_0.1 <- maespa_fla_0.1 %>% 
@@ -50,7 +63,7 @@ maespa_fla_0.1 <- maespa_fla_0.1 %>%
     absPAR_one_s = absPAR
   ) %>% 
   select(H, V, L, F, fla, name, absPAR_one_s, absPAR_two_s) %>% 
-  add_column(model = "maespa")
+  add_column(model = "MAESPA")
 
 maespa_n_others_fla_0.1 <- rbind(final_results_fla_0.1, maespa_fla_0.1)
 
