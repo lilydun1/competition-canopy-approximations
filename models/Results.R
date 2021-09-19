@@ -9,7 +9,8 @@ maespa_n_others_fla_0.1 %>%
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(title = "two stream", x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", colour = "Model") 
+  labs(title = "two stream", x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", colour = 
+  "Canopy Approximation") 
 
 maespa_n_others_fla_0.1 %>% 
   select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
@@ -18,48 +19,7 @@ maespa_n_others_fla_0.1 %>%
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", colour = "Model") 
-
-maespa_n_others_fla_0.1 %>% 
-  select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
-  filter(V == 0, L == 0.466) %>% 
-  ggplot(aes(F, absPAR_two_s)) + 
-  geom_point(aes(colour = as.factor(model))) + 
-  geom_line(aes(colour = as.factor(model))) + 
-  labs(x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", colour = "Model") 
-
-maespa_n_others_fla_0.1 %>% 
-  select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
-  filter(V == 0, L == 1.488) %>% 
-  ggplot(aes(F, absPAR_two_s)) + 
-  geom_point(aes(colour = as.factor(model))) + 
-  geom_line(aes(colour = as.factor(model))) + 
-  labs(x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", colour = "Model") 
-
-maespa_n_others_fla_0.1 %>% 
-  select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
-  filter(V == 0, L == 2.916) %>% 
-  ggplot(aes(F, absPAR_two_s)) + 
-  geom_point(aes(colour = as.factor(model))) + 
-  geom_line(aes(colour = as.factor(model))) + 
-  labs(x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", colour = "Model") 
-
-maespa_n_others_fla_0.1 %>% 
-  select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
-  filter(V == 0, L == 4.402) %>% 
-  ggplot(aes(F, absPAR_two_s)) + 
-  geom_point(aes(colour = as.factor(model))) + 
-  geom_line(aes(colour = as.factor(model))) + 
-  labs(x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", colour = "Model") 
-
-
-maespa_n_others_fla_0.1 %>% 
-  select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
-  filter(V == 0, L == 5.485) %>% 
-  ggplot(aes(F, absPAR_two_s)) + 
-  geom_point(aes(colour = as.factor(model))) + 
-  geom_line(aes(colour = as.factor(model))) + 
-  labs(x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", colour = "Model") 
+  labs(x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", colour = "Canopy Approximation") 
 
 maespa_n_others_fla_0.1 %>% 
   select(F, absPAR_one_s, model, V, L) %>%
