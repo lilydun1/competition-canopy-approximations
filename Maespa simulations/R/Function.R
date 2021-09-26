@@ -16,7 +16,7 @@ SD_height <- function(n = ntrees, h_mn, h_sd, sn = sqrt_n) {
     round(digits = 2) %>% 
     as.data.frame()
   perimeter_trees <- create_perimeter(nt = n, sqn = sn)
-  x <- replace(x$., perimeter_trees, 0.001) %>% 
+  x <- replace(x$., perimeter_trees, 0.00001) %>% 
     as.data.frame()
 }
 
@@ -37,7 +37,7 @@ replace_perimeter_r <- function(n = ntrees, sn = sqrt_n, crown_r = indivrad) {
 replace_perimeter_la <- function(n = ntrees, sn = sqrt_n, crown_la = indivlarea) {
   perimeter_trees <- create_perimeter(nt = n, sqn = sn)
   la_perimeter <- rep(crown_la, n) %>%
-    replace(perimeter_trees, values = 900) %>% 
+    replace(perimeter_trees, values = 2000) %>% 
     as.matrix()
 }
 
@@ -51,8 +51,8 @@ create_coordinates <- function(sn = sqrt_n) {
 }
 
 create_trees <- function(path, h_mn = 10, h_cv = 0.1, LAI = 1.54, ft_h = 1.99, fla = 1,
-                         plot_area = 20000, indivlarea = 47.62, indivrad = 5.087809/2, 
-                         indivhtcrown = 6.359762, indivdiam = 0.3, seed = 6, half = 1/2) {
+                         plot_area = 12000, indivlarea = 27, indivrad = 5.087809/2, 
+                         indivhtcrown = 6.359762, indivdiam = 0.3, seed = 1, half = 1/2) {
   wd <- setwd(path)
   on.exit(setwd(wd))
   set.seed(seed)
@@ -79,6 +79,10 @@ create_trees <- function(path, h_mn = 10, h_cv = 0.1, LAI = 1.54, ft_h = 1.99, f
   replacePAR("Trees.dat", "values", "indivlarea", newval = perimeter_la)
 }
 
+
+#need to write function to select between certain coordinates as focal trees, 
+#was thinking 25 trees for the smallest LAI
+
 create_simulation <- function(path = "simulations/Trail", template = "template_D",...) {
   unlink(path, recursive = T)
   dir.create(path, showWarnings = F, recursive = T)
@@ -96,7 +100,8 @@ run_simulation <- function(path) {
 }
 
 load_output <- function(path){
-  readdayflux(filename = file.path(path,"dayflx.dat")) %>% 
+  readdayflux(filename = file.path(path,"Dayflx.dat")) %>% 
     as_tibble() %>% 
     mutate(path = path, name = path %>% basename() %>% gsub("_S[1-3]", "",., perl = TRUE))
 }
+

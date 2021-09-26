@@ -4,28 +4,35 @@ names <- as_labeller(
 )
 
 
-#average
-mn_outputs_A %>% 
-  select(F, absPAR, H, V, L) %>%
-  ggplot(aes(F, absPAR)) + 
-  geom_point(aes(colour = as.factor(H))) + 
-  geom_line(aes(colour = as.factor(H))) + 
-  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(x = "FT height", y = "Absorbed PAR", colour = "MAESPA") +
-  scale_color_manual(values = c("#00AFBB"))
-
 mn_outputs_fla_0.1 %>% 
   select(F, absPAR, H, V, L) %>%
+  filter(V == 0 & L == 5.061) %>% 
   ggplot(aes(F, absPAR)) + 
   geom_point(aes(colour = as.factor(fla))) + 
   geom_line(aes(colour = as.factor(fla))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(x = "FT height", y = "Absorbed PAR", colour = "MAESPA")
 
-mn_outputs_WD %>% 
-  select(F, totPs, H, V, L, WD) %>%
-  ggplot(aes(F, totPs)) + 
-  geom_point(aes(colour = as.factor(WD))) + 
-  geom_line(aes(colour = as.factor(WD))) +
+mn_outputs_c_fla %>% 
+  select(F, absPAR, H, V, L, fla) %>%
+  ggplot(aes(F, absPAR)) + 
+  geom_point(aes(colour = as.factor(fla))) + 
+  geom_line(aes(colour = as.factor(fla))) +
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(title = "photosynthesis", x = "FT height", y = "Gross photosynthesis", colour = "Wet or Dry")
+
+mn_outputs_fla_0.1 %>% 
+  select(F, absPAR, H, V, L) %>% 
+  ggplot(aes(F, absPAR)) + 
+  geom_point(aes(colour = as.factor(fla))) + 
+  geom_line(aes(colour = as.factor(fla))) + 
+  facet_grid(rows = vars(V), cols = vars(L)) +
+  labs(x = "FT height", y = "Absorbed PAR", colour = "MAESPA")
+
+output_combined_fla_0.1 %>% 
+  select(F, absPAR, H, V, L) %>% 
+  ggplot(aes(F, absPAR)) + 
+  geom_point(aes(colour = as.factor(fla))) + 
+  geom_line(aes(colour = as.factor(fla))) + 
+  facet_grid(rows = vars(V), cols = vars(L)) +
+  labs(x = "FT height", y = "Absorbed PAR", colour = "MAESPA")
