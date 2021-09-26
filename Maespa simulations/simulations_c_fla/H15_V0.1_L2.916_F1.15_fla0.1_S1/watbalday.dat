@@ -19,4 +19,4 @@ qc: soil heat transport                     MJ m-2 day-1
 radinterc: total radiation intercepted      MJ m-2 day-1
                                                                                 
 Columns: day wsoil wsoilroot swp ppt tfall et etmeas discharge soilevap fsoil qh qe qn qc radinterc
-      1    388.8109    194.5809      0.0000      3.2107      2.3697      9.8664      0.0000      0.0727      0.0000      1.0000      0.0000      0.0000      0.0000      0.0000     49.2828
+      1    390.5574    196.3274      0.0000      3.2107      2.3359     21.3611      0.0000      0.0727      0.0000      1.0000      0.0000      0.0000      0.0000      0.0000    104.7893
