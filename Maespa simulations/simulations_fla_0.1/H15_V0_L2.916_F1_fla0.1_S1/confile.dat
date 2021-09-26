@@ -13,8 +13,8 @@ enddate = '01/10/01'
 
 indicate which target tree(s) to use.
 &treescon
-notrees = 1225
-itargets = 613
+notrees = 1296
+itargets = 666
 /
 
 number of angles and layers to integrate over.
