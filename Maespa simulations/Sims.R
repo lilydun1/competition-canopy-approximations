@@ -105,6 +105,17 @@ mn_outputs_c_fla <- output_combined_c_fla %>%
   group_by(H, V, L, F, fla, Tree, name) %>% 
   summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean)
 
+#whole stand as focal trees
+L <- c(0.44, 1.521, 2.916, 4.556, 5.402)
+
+create_simulation_f_stand(path = "poop/poop", template = "template_A", 
+                  h_mn = 15, h_cv = 0, 
+                  LAI = 5.402, ft_h = 0.5, 
+                  fla = 0.1, seed = 1)
+run_simulation(path = "poop/poop")
+
+Plotstand(treesfile = "trees.dat")
+
 #wet and dry 
 H <- c(15)
 V <- c(0.10, 0.25)
