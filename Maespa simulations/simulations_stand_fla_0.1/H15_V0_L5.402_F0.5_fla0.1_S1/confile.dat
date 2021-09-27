@@ -1,0 +1,41 @@
+&control
+iohrly=0
+iotutd=1
+ioresp=0
+iohist=0
+/
+
+dates for simulation start and end (must overlap with met file).
+&dates
+startdate = '01/10/01'
+enddate = '01/10/01'
+/
+
+indicate which target tree(s) to use.
+&treescon
+notrees = 2401
+itargets = 951 952 953 954 955 956 957 958 959 960 961 1000 1001 1002 1003 1004 1005 1006 1007 1008 1009 1010 1049 1050 1051 1052 1053 1054 1055 1056 1057 1058 1059 1098 1099 1100 1101 1102 1103 1104 1105 1106 1107 1108 1147 1148 1149 1150 1151 1152 1153 1154 1155 1156 1157 1196 1197 1198 1199 1200 1201 1202 1203 1204 1205 1206 1245 1246 1247 1248 1249 1250 1251 1252 1253 1254 1255 1294 1295 1296 1297 1298 1299 1300 1301 1302 1303 1304 1343 1344 1345 1346 1347 1348 1349 1350 1351 1352 1353 1392 1393 1394 1395 1396 1397 1398 1399 1400 1401 1402 1441 1442 1443 1444 1445 1446 1447 1448 1449 1450 1451 
+/
+
+number of angles and layers to integrate over.
+&diffang
+nolay = 6
+nzen = 5
+naz= 11
+/
+
+choice of submodels.
+&model
+modelgs = 4
+modelrd = 0
+modeljm = 0
+itermax = 0
+modelss = 0
+/
+
+climate change scenarios (rename to ccscen to enable)
+&ccscenX
+co2inc = 0.0
+tinc = 0.0
+/
+
