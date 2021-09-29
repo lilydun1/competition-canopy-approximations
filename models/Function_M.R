@@ -6,19 +6,25 @@ load_trees <- function(path) {
            x = trees$xy$xycoords[seq(1, length(trees$xy$xycoords), by = 2)], 
            y = trees$xy$xycoords[seq(2, length(trees$xy$xycoords), by = 2)],
            focal = ifelse(x == 105.54 & y == 90.46, TRUE, FALSE))
-    } else if(trees$plot$notrees != 2304 & trees$plot$notrees != 196) {
+    } else if(trees$plot$notrees == 676) {
     data <- tibble(radx = trees$indivradx$values, rady =  trees$indivrady$values,  htcrown = trees$indivhtcrown$values, 
                      diam = trees$indivdiam$values,  httrunk = trees$indivhttrunk$values, larea = trees$indivlarea$values, 
                      x = trees$xy$xycoords[seq(1, length(trees$xy$xycoords), by = 2)], 
                      y = trees$xy$xycoords[seq(2, length(trees$xy$xycoords), by = 2)],
-                   focal = ifelse(x == 98 & y == 98, TRUE, FALSE))
-    } else if(trees$plot$notrees == 2304) {
-    data <- tibble(radx = trees$indivradx$values, rady =  trees$indivrady$values,  htcrown = trees$indivhtcrown$values, 
+                   focal = ifelse(x == 101.92 & y == 94.08, TRUE, FALSE))
+    } else if(trees$plot$notrees == 1296) {
+      data <- tibble(radx = trees$indivradx$values, rady =  trees$indivrady$values,  htcrown = trees$indivhtcrown$values, 
                      diam = trees$indivdiam$values,  httrunk = trees$indivhttrunk$values, larea = trees$indivlarea$values, 
                      x = trees$xy$xycoords[seq(1, length(trees$xy$xycoords), by = 2)], 
                      y = trees$xy$xycoords[seq(2, length(trees$xy$xycoords), by = 2)],
-                   focal = ifelse(x == 100.09 & y == 95.91, TRUE, FALSE))
-    }
+                     focal = ifelse(x == 100.8 & y == 95.2, TRUE, FALSE))
+    } else if(trees$plot$notrees != 196 & trees$plot$notrees != 676 & trees$plot$notrees != 1296) {
+      data <- tibble(radx = trees$indivradx$values, rady =  trees$indivrady$values,  htcrown = trees$indivhtcrown$values, 
+                     diam = trees$indivdiam$values,  httrunk = trees$indivhttrunk$values, larea = trees$indivlarea$values, 
+                     x = trees$xy$xycoords[seq(1, length(trees$xy$xycoords), by = 2)], 
+                     y = trees$xy$xycoords[seq(2, length(trees$xy$xycoords), by = 2)],
+                     focal = ifelse(x == 98 & y == 98, TRUE, FALSE))
+    } 
   data <- data %>% 
     filter(x > 27.999, x < 168.001, y > 27.999, y < 168.001)
 }
@@ -32,7 +38,7 @@ model_simp <- function(data) {
     ungroup() %>% 
     arrange(desc(t_h)) %>% 
     mutate(
-      lai = cumsum(larea)/10204, 
+      lai = cumsum(larea)/6123, 
       light_ft = exp(-0.5*lai),
       lai_ppa = floor(lai),
       light_ppa = exp(-0.5*lai_ppa)) %>% 
@@ -101,7 +107,7 @@ organising_results <- function(data, comb) {
 }
 
 deep_leaf_distribtuion <- function(httrunk, htcrown = 6.36, radx = 2.54, rady = 2.54, 
-                                   larea = 47.62, n_slices = 50) {
+                                   larea = 27, n_slices = 50) {
   # adaption from Maeswrap, https://github.com/RemkoDuursma/Maeswrap/blob/master/R/coord3dshape.R
   z <- seq(0, 1, length.out = n_slices)
   zabs <- z*htcrown
@@ -127,22 +133,22 @@ deep_crown_set_up <- function(d) {
   data <- plyr::ldply(deep_crown_distribution, data.frame) %>% 
     cbind(df) %>% 
     arrange(desc(h)) %>% 
-    mutate(la = cumsum(larea)/10204)
+    mutate(la = cumsum(larea)/6123)
   if(nrow(data) == 100*50) {
     data <- data %>% 
       filter(tree_num == 55)
-  } else if(nrow(data) == 289*50) {
+  } else if(nrow(data) == 324*50) {
     data <- data %>% 
-      filter(tree_num == 145)
-  } else if(nrow(data) == 625*50) {
+      filter(tree_num == 171)
+  } else if(nrow(data) == 676*50) {
     data <- data %>% 
-      filter(tree_num == 313)
+      filter(tree_num == 351)
   } else if(nrow(data) == 961*50) {
     data <- data %>% 
       filter(tree_num == 481)
-  } else if(nrow(data) == 1156*50) {
+  } else if(nrow(data) == 1225*50) {
     data <- data %>% 
-      filter(tree_num == 595)     
+      filter(tree_num == 613)     
   }
 }
 
@@ -159,8 +165,8 @@ PAR_calculator_DC <- function(la) {
       PAR_two_s = 0.77* PAR*(exp(-0.77*la) + (1- exp(-0.77*la))*exp(-0.4*la)), 
       MJ_per_H_one_s = PAR_one_s * UMOLperStoMJperH, 
       MJ_per_H_two_s = PAR_two_s * UMOLperStoMJperH )
-  tibble(absPAR_one_s = pracma::trapz(met$time, met$MJ_per_H_one_s) * 0.1, 
-         absPAR_two_s = pracma::trapz(met$time, met$MJ_per_H_two_s) * 0.1) 
+  tibble(absPAR_one_s = pracma::trapz(met$time, met$MJ_per_H_one_s) * 1, 
+         absPAR_two_s = pracma::trapz(met$time, met$MJ_per_H_two_s) * 1) 
 }
 
 applying_DC <- function(data) {
@@ -170,18 +176,23 @@ applying_DC <- function(data) {
 }
 
 summarise_DC <- function(data) {
-  d <- deep_leaf_distribtuion(results_fla_0.1[[1]]$httrunk[[1]]) %>% 
-    mutate(larea = (larea/47.62)*0.1)
-  data %>% 
-    mutate(
-    absPAR_one_s = absPAR_one_s*d$larea, 
-    absPAR_two_s = absPAR_two_s*d$larea
-  ) %>% 
+  data <- data %>% 
     summarise(
-    absPAR_one_s = sum(absPAR_one_s), 
-    absPAR_two_s = sum(absPAR_two_s)
+    absPAR_one_s = mean(absPAR_one_s), 
+    absPAR_two_s = mean(absPAR_two_s)
   )
 }
 
-#stand functions  
+#stand functions
+load_trees <- function(path) {
+  trees <- parseFile(file.path(path,"trees.dat"))
+  data <- tibble(radx = trees$indivradx$values, rady =  trees$indivrady$values,  htcrown = trees$indivhtcrown$values, 
+                   diam = trees$indivdiam$values,  httrunk = trees$indivhttrunk$values, larea = trees$indivlarea$values, 
+                   x = trees$xy$xycoords[seq(1, length(trees$xy$xycoords), by = 2)], 
+                   y = trees$xy$xycoords[seq(2, length(trees$xy$xycoords), by = 2)],
+                   focal = ifelse(x > 27.999 & x < 168.001 & y > 27.999 & y < 168.001, TRUE, FALSE))
+  data <- data %>% 
+    filter(x > 27.999, x < 168.001, y > 27.999, y < 168.001)
+}
+
 

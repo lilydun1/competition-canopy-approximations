@@ -38,6 +38,7 @@ mn_outputs_fla_0.1 <- output_combined_fla_0.1 %>%
   group_by(H, V, L, F, fla, Tree, name) %>% 
   summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean)
 
+write_csv(mn_outputs_fla_0.1, "maespa_fla_0.1.csv")
 #for the average one with everything and 27 la 
 H <- c(15)
 V <- c(0, 0.1, 0.25, 0.5)
@@ -137,6 +138,11 @@ output_combined_stand_fla_0.1 <- combinations_stand_fla_0.1 %>%
 mn_outputs_stand_fla_0.1 <- output_combined_stand_fla_0.1 %>% 
   group_by(H, V, L, F, fla, Tree, name) %>% 
   summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean) 
+
+mn_stand_fla_0.1 <- mn_outputs_stand_fla_0.1 %>% 
+  group_by(H, V, L, F, fla, name) %>% 
+  summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean) 
+
 
 #wet and dry 
 H <- c(15)
