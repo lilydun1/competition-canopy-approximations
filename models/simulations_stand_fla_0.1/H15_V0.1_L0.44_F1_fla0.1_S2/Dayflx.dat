@@ -1,0 +1,38 @@
+Program:    MAESPA                                                                          
+Control:    &control                                                                        
+Trees:      Example trees file.                                                             
+Structure:                                                                      Multispecies
+Physiology:                                                                     Multispecies
+Met data:   Example met file (Tumbarumba)                                                   
+Water bal.: Example water balance parameters.                                               
+                                                                                
+DOY: simulation date
+Tree: tree number
+Spec: tree species number
+absPAR:   absorbed PAR              MJ tree-1 d-1
+absNIR:   absorbed NIR              MJ  tree-1 d-1
+absTherm: absorbed thermal          MJ tree-1 d-1
+totPs: gross photosynthesis         mol tree-1 d-1
+totRf: daily foliar respiration     mol tree-1 d-1
+netPs: photosyn. net of foliar resp   mol tree-1 d-1
+totLE1: daily transpiration         mol H2O tree-1 d-1
+totLE2: daily transpirn (CANOPY calc) mol H2O m-2 d-1
+totH:  daily sensible heat flux     MJ tree-1 d-1
+                                                                                
+Columns: DOY Tree Spec absPAR absNIR absTherm totPs totRf netPs totLE1 totLE2 totH
+      1   76    1       0.5467       0.1260       0.0721       0.0459       0.0026       0.0433       5.3004       0.0361       0.4585
+      1   77    1       0.5579       0.1283       0.0721       0.0461       0.0026       0.0435       5.3402       0.0363       0.4702
+      1   78    1       0.5529       0.1272       0.0721       0.0460       0.0026       0.0434       5.3245       0.0362       0.4649
+      1   79    1       0.5552       0.1277       0.0721       0.0461       0.0026       0.0435       5.3265       0.0362       0.4675
+      1   90    1       0.5528       0.1272       0.0721       0.0460       0.0026       0.0434       5.3254       0.0362       0.4648
+      1   91    1       0.5610       0.1289       0.0721       0.0462       0.0026       0.0436       5.3495       0.0363       0.4735
+      1   92    1       0.5604       0.1288       0.0721       0.0462       0.0026       0.0436       5.3488       0.0363       0.4729
+      1   93    1       0.5532       0.1273       0.0721       0.0460       0.0026       0.0434       5.3245       0.0362       0.4653
+      1  104    1       0.5544       0.1275       0.0721       0.0461       0.0026       0.0434       5.3272       0.0362       0.4665
+      1  105    1       0.5615       0.1290       0.0721       0.0462       0.0026       0.0436       5.3479       0.0363       0.4742
+      1  106    1       0.5613       0.1290       0.0721       0.0462       0.0026       0.0436       5.3474       0.0363       0.4740
+      1  107    1       0.5556       0.1278       0.0721       0.0461       0.0026       0.0435       5.3269       0.0362       0.4681
+      1  118    1       0.5508       0.1268       0.0721       0.0460       0.0026       0.0434       5.3147       0.0362       0.4628
+      1  119    1       0.5587       0.1284       0.0721       0.0462       0.0026       0.0435       5.3398       0.0363       0.4712
+      1  120    1       0.5503       0.1267       0.0721       0.0460       0.0026       0.0434       5.3152       0.0362       0.4622
+      1  121    1       0.5545       0.1276       0.0721       0.0460       0.0026       0.0434       5.3237       0.0362       0.4669

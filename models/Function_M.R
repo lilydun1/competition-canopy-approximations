@@ -182,4 +182,6 @@ summarise_DC <- function(data) {
     absPAR_two_s = sum(absPAR_two_s)
   )
 }
-  
+
+#stand functions  
+
