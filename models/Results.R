@@ -3,39 +3,53 @@ names <- as_labeller(
     `0.44` = "LAI 0.44", `1.521`= "LAI 1.429", `2.916`= "LAI 2.98", `4.556`= "LAI 4.238", `5.402`= "LAI 5.402")
 )
 
+#fla 0.1 
 maespa_n_others_fla_0.1 %>% 
   select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
   ggplot(aes(F, absPAR_two_s)) + 
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(title = "two stream", x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", colour = 
-  "Canopy Approximation") 
+  labs(title = "two stream - fla 0.1", x = "Ratio focal tree height : stand", y = "Absorbed PAR (MJ tree-1 d-1)", 
+       colour = "Canopy Approximation") 
 
 maespa_n_others_fla_0.1 %>% 
   select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
-  filter(V == 0) %>% 
-  ggplot(aes(F, absPAR_two_s)) + 
-  geom_point(aes(colour = as.factor(model))) + 
-  geom_line(aes(colour = as.factor(model))) + 
-  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", colour = "Canopy Approximation") 
-
-maespa_n_others_fla_0.1 %>% 
-  select(F, absPAR_one_s, model, V, L) %>%
   ggplot(aes(F, absPAR_one_s)) + 
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(title = "one stream", x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
+  labs(title = "one stream - fla 0.1", x = "Ratio focal tree height : stand", y = "Absorbed PAR (MJ tree-1 d-1)", 
+       colour = "Canopy Approximation") 
 
-maespa_n_others_fla_47.62 %>% 
+#fla 27
+maespa_n_others_fla_27 %>% 
+  select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
+  ggplot(aes(F, absPAR_two_s)) + 
+  geom_point(aes(colour = as.factor(model))) + 
+  geom_line(aes(colour = as.factor(model))) + 
+  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
+  labs(title = "two stream - fla 27", x = "Ratio focal tree height : stand", y = "Absorbed PAR (MJ tree-1 d-1)", 
+       colour = "Canopy Approximation") 
+
+maespa_n_others_fla_27 %>% 
+  select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
+  ggplot(aes(F, absPAR_one_s)) + 
+  geom_point(aes(colour = as.factor(model))) + 
+  geom_line(aes(colour = as.factor(model))) + 
+  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
+  labs(title = "one stream - fla 27", x = "Ratio focal tree height : stand", y = "Absorbed PAR (MJ tree-1 d-1)", 
+       colour = "Canopy Approximation") 
+
+#stand 0.1
+maespa_n_others_stand_fla_0.1 %>% 
   select(F, absPAR_two_s, model, V, L) %>%
   ggplot(aes(F, absPAR_two_s)) + 
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(title = "no self-shading", x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
+  labs(title = "two stream - stand 0.1", x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", 
+       colour = "Canopy Approximation")
 
 names_fla <- as_labeller(
   c(`0.1` = "f_la 0.1", `0.5` = "f_la 0.5", `1` = "f_la 1", 

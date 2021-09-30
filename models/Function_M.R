@@ -184,15 +184,33 @@ summarise_DC <- function(data) {
 }
 
 #stand functions
-load_trees <- function(path) {
+load_trees_stand <- function(path) {
   trees <- parseFile(file.path(path,"trees.dat"))
-  data <- tibble(radx = trees$indivradx$values, rady =  trees$indivrady$values,  htcrown = trees$indivhtcrown$values, 
+  if(trees$plot$notrees!= 2025) {
+    data <- tibble(radx = trees$indivradx$values, rady =  trees$indivrady$values,  htcrown = trees$indivhtcrown$values, 
                    diam = trees$indivdiam$values,  httrunk = trees$indivhttrunk$values, larea = trees$indivlarea$values, 
                    x = trees$xy$xycoords[seq(1, length(trees$xy$xycoords), by = 2)], 
                    y = trees$xy$xycoords[seq(2, length(trees$xy$xycoords), by = 2)],
-                   focal = ifelse(x > 27.999 & x < 168.001 & y > 27.999 & y < 168.001, TRUE, FALSE))
+                   focal = ifelse(x > 75.37 & x < 120.63  & y > 75.37 & y < 120.63, TRUE, FALSE))
+  } else if(trees$plot$notrees == 2025) {
+    data <- tibble(radx = trees$indivradx$values, rady =  trees$indivrady$values,  htcrown = trees$indivhtcrown$values, 
+                   diam = trees$indivdiam$values,  httrunk = trees$indivhttrunk$values, larea = trees$indivlarea$values, 
+                   x = trees$xy$xycoords[seq(1, length(trees$xy$xycoords), by = 2)], 
+                   y = trees$xy$xycoords[seq(2, length(trees$xy$xycoords), by = 2)],
+                   focal = ifelse(x > 75.72 & x < 115.83  & y > 75.72 & y < 115.83, TRUE, FALSE))
+  }
   data <- data %>% 
     filter(x > 27.999, x < 168.001, y > 27.999, y < 168.001)
 }
 
+organising_results_stand <- function(data, comb) {
+  df <- plyr::ldply(data, data.frame) %>% 
+    bind_cols(comb) %>% 
+    select(H, V, L, F, fla, S, la_stand, name, absPAR_one_s, absPAR_two_s) %>% 
+    mutate(
+      name = name %>% gsub("_S[1-3]", "",., perl = TRUE)
+    ) %>% 
+    group_by(H, V, L, F, fla, la_stand, name) %>% 
+    summarise_at(vars(absPAR_one_s, absPAR_two_s), mean)
+}
 
