@@ -20,4 +20,4 @@ totLE2: daily transpirn (CANOPY calc) mol H2O m-2 d-1
 totH:  daily sensible heat flux     MJ tree-1 d-1
                                                                                 
 Columns: DOY Tree Spec absPAR absNIR absTherm totPs totRf netPs totLE1 totLE2 totH
-      1  613    1       0.9148       0.2812       0.5489       0.1499       0.0131       0.1368      14.0180       0.7452       0.8118
+      1  666    1       1.1980       0.3375       0.5234       0.1716       0.0131       0.1585       8.7245       0.8985       1.3698
