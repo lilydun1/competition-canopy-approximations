@@ -22,6 +22,19 @@ maespa_n_others_fla_0.1 %>%
   labs(title = "one stream - fla 0.1", x = "Ratio focal tree height : stand", y = "Absorbed PAR (MJ tree-1 d-1)", 
        colour = "Canopy Approximation") 
 
+actual_fla_0.1 <- maespa_n_others_fla_0.1 %>% filter(model == "MAESPA")
+predicted_ppa_fla_0.1 <- maespa_n_others_fla_0.1 %>% filter(model == "PPA")
+predicted_ft_fla_0.1 <- maespa_n_others_fla_0.1 %>% filter(model == "FLAT TOP")
+predicted_DC_fla_0.1 <- maespa_n_others_fla_0.1 %>% filter(model == "DEEP CROWN")
+
+rmse(actual_fla_0.1$absPAR_two_s, predicted_ppa_fla_0.1$absPAR_two_s)
+rmse(actual_fla_0.1$absPAR_two_s, predicted_ft_fla_0.1$absPAR_two_s)
+rmse(actual_fla_0.1$absPAR_two_s, predicted_DC_fla_0.1$absPAR_two_s)
+
+rmse(actual_fla_0.1$absPAR_one_s, predicted_ppa_fla_0.1$absPAR_one_s)
+rmse(actual_fla_0.1$absPAR_one_s, predicted_ft_fla_0.1$absPAR_one_s)
+rmse(actual_fla_0.1$absPAR_one_s, predicted_DC_fla_0.1$absPAR_one_s)
+
 #fla 27
 maespa_n_others_fla_27 %>% 
   select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
@@ -41,6 +54,19 @@ maespa_n_others_fla_27 %>%
   labs(title = "one stream - fla 27", x = "Ratio focal tree height : stand", y = "Absorbed PAR (MJ tree-1 d-1)", 
        colour = "Canopy Approximation") 
 
+actual_fla_27 <- maespa_n_others_fla_27 %>% filter(model == "MAESPA")
+predicted_ppa_fla_27 <- maespa_n_others_fla_27 %>% filter(model == "PPA")
+predicted_ft_fla_27 <- maespa_n_others_fla_27 %>% filter(model == "FLAT TOP")
+predicted_DC_fla_27 <- maespa_n_others_fla_27 %>% filter(model == "DEEP CROWN")
+
+rmse(actual_fla_27$absPAR_two_s, predicted_ppa_fla_27$absPAR_two_s)
+rmse(actual_fla_27$absPAR_two_s, predicted_ft_fla_27$absPAR_two_s)
+rmse(actual_fla_27$absPAR_two_s, predicted_DC_fla_27$absPAR_two_s)
+
+rmse(actual_fla_27$absPAR_one_s, predicted_ppa_fla_27$absPAR_one_s)
+rmse(actual_fla_27$absPAR_one_s, predicted_ft_fla_27$absPAR_one_s)
+rmse(actual_fla_27$absPAR_one_s, predicted_DC_fla_27$absPAR_one_s)
+
 #stand 0.1
 maespa_n_others_stand_fla_0.1 %>% 
   select(F, absPAR_two_s, model, V, L) %>%
@@ -50,6 +76,16 @@ maespa_n_others_stand_fla_0.1 %>%
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(title = "two stream - stand 0.1", x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", 
        colour = "Canopy Approximation")
+
+actual_stand_fla_0.1 <- maespa_n_others_stand_fla_0.1 %>% filter(model == "MAESPA")
+predicted_ppa_stand_fla_0.1 <- maespa_n_others_stand_fla_0.1 %>% filter(model == "PPA")
+predicted_ft_stand_fla_0.1 <- maespa_n_others_stand_fla_0.1 %>% filter(model == "FLAT TOP")
+
+rmse(actual_stand_fla_0.1$absPAR_two_s, predicted_ppa_stand_fla_0.1$absPAR_two_s)
+rmse(actual_stand_fla_0.1$absPAR_two_s, predicted_ft_stand_fla_0.1$absPAR_two_s)
+
+rmse(actual_stand_fla_0.1$absPAR_one_s, predicted_ppa_stand_fla_0.1$absPAR_one_s)
+rmse(actual_stand_fla_0.1$absPAR_one_s, predicted_ft_stand_fla_0.1$absPAR_one_s)
 
 names_fla <- as_labeller(
   c(`0.1` = "f_la 0.1", `0.5` = "f_la 0.5", `1` = "f_la 1", 

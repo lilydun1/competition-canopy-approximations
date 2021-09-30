@@ -102,7 +102,7 @@ results_PAR_ppa_fla_27 <- model_conditions_fla_27 %>%
   purrr::map(PAR_calculator_ppa)
 
 final_results_ft_fla_27 <- organising_results(results_PAR_ft_fla_27, combinations_fla_27) %>% 
-  add_column(model = "FT") 
+  add_column(model = "FLAT TOP") 
 
 final_results_ppa_fla_27 <- organising_results(results_PAR_ppa_fla_27, combinations_fla_27) %>% 
   add_column(model = "PPA") 
@@ -141,7 +141,7 @@ maespa_fla_27 <- maespa_fla_27 %>%
   absPAR_two_s = absPAR,
   absPAR_one_s = absPAR) %>% 
   select(H, V, L, F, fla, name, absPAR_one_s, absPAR_two_s) %>% 
-  add_column(model = "maespa")
+  add_column(model = "MAESPA")
 
 maespa_n_others_fla_27 <- rbind(final_results_fla_27, maespa_fla_27)
 
@@ -249,7 +249,7 @@ results_PAR_ppa_stand_fla_0.1 <- model_conditions_stand_fla_0.1 %>%
   purrr::map(PAR_calculator_ppa)
 
 final_results_ft_stand_fla_0.1 <- organising_results_stand(results_PAR_ft_stand_fla_0.1, combinations_stand_fla_0.1) %>% 
-  add_column(model = "FT")
+  add_column(model = "FLAT TOP")
 
 final_results_ppa_stand_fla_0.1 <- organising_results_stand(results_PAR_ppa_stand_fla_0.1, combinations_stand_fla_0.1) %>% 
   add_column(model = "PPA")
