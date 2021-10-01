@@ -117,10 +117,9 @@ create_trees_f_stand <- function(path, h_mn = 10, h_cv = 0.1, LAI = 1.54, ft_h =
   h_sd <- h_mn * h_cv
   ntrees <- ceiling(plot_area*(LAI/indivlarea))
   sqrt_n <- ceiling(sqrt(ntrees))
-  SD_height_df <- SD_height(n = ntrees, h_mn, h_sd, sn = sqrt_n) 
+  SD_height_df <- SD_height(n = ntrees, h_mn, h_sd, sn = sqrt_n) %>% as.matrix()
   coordinates <- create_coordinates(sqrt_n)
   ft <- whole_stand(ntrees)
-  SD_height_df <- replace(SD_height_df$., ft, h_mn*ft_h)
   perimeter_h <- replace_perimeter_h(ntrees, sqrt_n, indivhtcrown, h_mn)
   perimeter_r <- replace_perimeter_r(ntrees, sqrt_n, indivrad)
   perimeter_la <- replace_perimeter_la(ntrees, sqrt_n, indivlarea) %>% 
