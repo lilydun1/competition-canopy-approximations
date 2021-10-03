@@ -1,3 +1,4 @@
+library(Metrics)
 names <- as_labeller(
   c(`0` = "V 0", `0.1` = "V 0.1", `0.25` = "V 0.25", `0.5` = "V 0.5", `0.75` = "V 0.75", 
     `0.44` = "LAI 0.44", `1.521`= "LAI 1.429", `2.916`= "LAI 2.98", `4.556`= "LAI 4.238", `5.402`= "LAI 5.402")
@@ -11,7 +12,9 @@ maespa_n_others_fla_0.1 %>%
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(x = "Ratio focal tree height : stand", y = "Absorbed PAR (MJ tree-1 d-1)", 
-       colour = "Canopy Approximation") +
+       colour = "Canopy Approximation") +  
+  scale_colour_manual(labels = c("Deep Crown", "Flat Top", "MAESPA", "PPA"), 
+                      values = c("red", "#00BA38", "grey45", "goldenrod2")) +
   theme(
     axis.ticks = element_line(colour = "grey"),
     panel.grid.major = element_line(colour = "grey", size=0.1),
@@ -25,8 +28,8 @@ maespa_n_others_fla_0.1 %>%
                               size = 11), 
     legend.title= element_text(family = "Helvetica", colour = "black",
                                size = 11),
+    legend.text = element_text(family = "Helvetica", colour = "black"),
     legend.title.align	= 0.5) 
-  
 
 #fla 0.1 
 maespa_n_others_fla_0.1 %>% 
@@ -104,6 +107,31 @@ maespa_n_others_c_fla %>%
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_wrap(~fla, scales = "free", labeller = names_c_fla) +
+  labs(x = "Ratio focal tree height : stand", y = "Absorbed PAR (MJ m-2 d-1)", colour = "Canopy Approximation") +  
+  scale_colour_manual(labels = c("Deep Crown", "Flat Top", "MAESPA", "PPA"), 
+                      values = c("red", "#00BA38", "grey45", "goldenrod2")) +
+  theme(
+    axis.ticks = element_line(colour = "grey"),
+    panel.grid.major = element_line(colour = "grey", size=0.1),
+    panel.grid.minor = element_blank(), 
+    panel.background = element_rect(fill = "white"),
+    strip.background = element_rect(fill="white"), 
+    panel.border = element_rect(colour = "grey45", fill = NA), 
+    legend.key = element_rect(fill = "white"),
+    strip.text = element_text(family = "Helvetica", colour = "black", size = 9), 
+    axis.title = element_text(family = "Helvetica", colour = "black",
+                              size = 11), 
+    legend.title= element_text(family = "Helvetica", colour = "black",
+                               size = 11),
+    legend.text = element_text(family = "Helvetica", colour = "black"),
+    legend.title.align	= 0.5) 
+
+maespa_n_others_c_fla %>% 
+  select(F, absPAR_two_s, model, fla, L) %>%
+  ggplot(aes(F, absPAR_two_s)) + 
+  geom_point(aes(colour = as.factor(model))) + 
+  geom_line(aes(colour = as.factor(model))) + 
+  facet_wrap(~fla, scales = "free", labeller = names_c_fla) +
   labs(x = "Focal tree height", y = "Absorbed PAR", colour = "Model")
 
 actual_c_fla <- maespa_n_others_c_fla %>% filter(model == "MAESPA")
@@ -121,12 +149,12 @@ rmse(actual_c_fla$absPAR_one_s, predicted_DC_c_fla$absPAR_one_s)
 
 #stand 0.1
 maespa_n_others_stand_fla_0.1 %>% 
-  select(F, absPAR_two_s, model, V, L) %>%
-  ggplot(aes(F, absPAR_two_s)) + 
+  select(absPAR_two_s, model, V, L) %>%
+  ggplot(aes(L, absPAR_two_s)) + 
   geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
-  facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(title = "two stream - stand 0.1", x = "Focal tree height", y = "Absorbed PAR (MJ tree-1 d-1)", 
+  facet_wrap(~V) +
+  labs(title = "two stream - stand 0.1", x = "V", y = "Absorbed PAR (MJ tree-1 d-1)", 
        colour = "Canopy Approximation")
 
 actual_stand_fla_0.1 <- maespa_n_others_stand_fla_0.1 %>% filter(model == "MAESPA")
@@ -135,9 +163,6 @@ predicted_ft_stand_fla_0.1 <- maespa_n_others_stand_fla_0.1 %>% filter(model == 
 
 rmse(actual_stand_fla_0.1$absPAR_two_s, predicted_ppa_stand_fla_0.1$absPAR_two_s)
 rmse(actual_stand_fla_0.1$absPAR_two_s, predicted_ft_stand_fla_0.1$absPAR_two_s)
-
-rmse(actual_stand_fla_0.1$absPAR_one_s, predicted_ppa_stand_fla_0.1$absPAR_one_s)
-rmse(actual_stand_fla_0.1$absPAR_one_s, predicted_ft_stand_fla_0.1$absPAR_one_s)
 
 
 

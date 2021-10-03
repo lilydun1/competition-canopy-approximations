@@ -45,36 +45,6 @@
                 "type": 1,
                 "is_package_breakpoint": false,
                 "package_name": ""
-            },
-            {
-                "id": 7,
-                "path": "~/Documents/Honours/Maespa simulations/Sims.R",
-                "line_number": 45,
-                "function_steps": "",
-                "function_name": "toplevel",
-                "state": 1,
-                "editor_state": 1,
-                "editor_line_number": 45,
-                "is_pending_debug_completion": false,
-                "needs_updated_steps": true,
-                "type": 1,
-                "is_package_breakpoint": false,
-                "package_name": ""
-            },
-            {
-                "id": 10,
-                "path": "~/Documents/Honours/Maespa simulations/R/Function.R",
-                "line_number": 100,
-                "function_steps": "",
-                "function_name": "whole_stand",
-                "state": 2,
-                "editor_state": 2,
-                "editor_line_number": 100,
-                "is_pending_debug_completion": false,
-                "needs_updated_steps": true,
-                "type": 0,
-                "is_package_breakpoint": false,
-                "package_name": ""
             }
         ]
     }

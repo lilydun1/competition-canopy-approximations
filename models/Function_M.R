@@ -61,7 +61,7 @@ PAR_calculator_ft <- function(data, indi_la = 1) {
     select(time = TIME, PAR) %>%
     mutate(      
       PAR_one_s = 0.77 * PAR * exp(-0.77*L_ft),
-      PAR_two_s = 0.77*PAR*(exp(-0.77*L_ft) + (1- exp(-0.77*L_ft))*exp(-0.4*L_ft)), 
+      PAR_two_s = 0.77*PAR*(exp(-0.77*L_ft) + (1- exp(-0.77*L_ft))*exp(-0.35*L_ft)), 
       MJ_per_H_one_s = PAR_one_s * UMOLperStoMJperH, 
       MJ_per_H_two_s = PAR_two_s * UMOLperStoMJperH  # MJ
     )
@@ -86,7 +86,7 @@ PAR_calculator_ppa <- function(data, indi_la = 1) {
     select(time = TIME, PAR) %>%
     mutate(      
       PAR_one_s = 0.77 * PAR * exp(-0.77*L_ft),
-      PAR_two_s = 0.77*PAR*(exp(-0.77*L_ft) + (1- exp(-0.77*L_ft))*exp(-0.4*L_ft)), 
+      PAR_two_s = 0.77*PAR*(exp(-0.77*L_ft) + (1- exp(-0.77*L_ft))*exp(-0.35*L_ft)), 
       MJ_per_H_one_s = PAR_one_s * UMOLperStoMJperH, 
       MJ_per_H_two_s = PAR_two_s * UMOLperStoMJperH  # MJ
     )
@@ -162,7 +162,7 @@ PAR_calculator_DC <- function(la) {
     select(time = TIME, PAR) %>% 
     mutate(  
       PAR_one_s = 0.77 * PAR * exp(-0.77*la),
-      PAR_two_s = 0.77* PAR*(exp(-0.77*la) + (1- exp(-0.77*la))*exp(-0.4*la)), 
+      PAR_two_s = 0.77* PAR*(exp(-0.77*la) + (1- exp(-0.77*la))*exp(-0.35*la)), 
       MJ_per_H_one_s = PAR_one_s * UMOLperStoMJperH, 
       MJ_per_H_two_s = PAR_two_s * UMOLperStoMJperH )
   tibble(absPAR_one_s = pracma::trapz(met$time, met$MJ_per_H_one_s) * 1, 
@@ -203,14 +203,81 @@ load_trees_stand <- function(path) {
     filter(x > 27.999, x < 168.001, y > 27.999, y < 168.001)
 }
 
+met_f <- function(L_ft) {
+  met <- 
+    readmet(filename = "met.dat", nlines = -1) %>% 
+    as_tibble() %>% 
+    select(time = TIME, PAR) %>%
+    mutate(
+      PAR_one_s = 0.77 * PAR * exp(-0.77*L_ft),
+      PAR_two_s = 0.77*PAR*(exp(-0.77*L_ft) + (1- exp(-0.77*L_ft))*exp(-0.35*L_ft)), 
+      MJ_per_H_one_s = PAR_one_s * UMOLperStoMJperH, 
+      MJ_per_H_two_s = PAR_two_s * UMOLperStoMJperH  # MJ
+    )
+}
+
+data = model_conditions_stand_fla_0.1[[60]]
+
+PAR_calculator_ft_stand <- function(data, indi_la = 1) {
+  # constant to converts ymol/s to M J / h
+  UMOLperStoMJperH <-
+    3600 /  # s / hr
+    4.57 /  # umol quanta / J
+    10^6    # J / MJ
+  L_ft <- data %>% 
+    filter(focal == "TRUE") %>% 
+    pull(lai) 
+  # load met and convert PAR to J/hr
+  trying <- L_ft %>% 
+    map(met_f)
+  # integrate over the day using trapezoidal integration
+  for(i in 1:length(trying)){
+    trying[[i]] <- tibble(absPAR_one_s = pracma::trapz(trying[[i]]$time, trying[[i]]$MJ_per_H_one_s) * indi_la, 
+                          absPAR_two_s = pracma::trapz(trying[[i]]$time, trying[[i]]$MJ_per_H_two_s) * indi_la)
+  }
+  df <- plyr::ldply(trying, data.frame) %>% 
+    mutate(absPAR_one_s = absPAR_one_s*0.1, 
+           absPAR_two_s = absPAR_two_s*0.1) %>% 
+    summarise(absPAR_one_s = sum(absPAR_one_s), 
+              absPAR_two_s = sum(absPAR_two_s))
+}
+
+PAR_calculator_ppa_stand <- function(data, indi_la = 1) {
+  # constant to converts ymol/s to M J / h
+  UMOLperStoMJperH <-
+    3600 /  # s / hr
+    4.57 /  # umol quanta / J
+    10^6    # J / MJ
+  L_ft <- data %>% 
+    filter(focal == "TRUE") %>% 
+    pull(lai_ppa) 
+  # load met and convert PAR to J/hr
+  trying <- L_ft %>% 
+    map(met_f)
+  # integrate over the day using trapezoidal integration
+  for(i in 1:length(trying)){
+    trying[[i]] <- tibble(absPAR_one_s = pracma::trapz(trying[[i]]$time, trying[[i]]$MJ_per_H_one_s) * indi_la, 
+                          absPAR_two_s = pracma::trapz(trying[[i]]$time, trying[[i]]$MJ_per_H_two_s) * indi_la)
+  }
+  df <- plyr::ldply(trying, data.frame) %>%    
+    mutate(absPAR_one_s = absPAR_one_s*0.1, 
+           absPAR_two_s = absPAR_two_s*0.1) %>% 
+    summarise(absPAR_one_s = sum(absPAR_one_s), 
+              absPAR_two_s = sum(absPAR_two_s))
+}
+
 organising_results_stand <- function(data, comb) {
   df <- plyr::ldply(data, data.frame) %>% 
     bind_cols(comb) %>% 
-    select(H, V, L, F, fla, S, la_stand, name, absPAR_one_s, absPAR_two_s) %>% 
+    select(H, V, L, F, fla, S, name, absPAR_one_s, absPAR_two_s) %>% 
     mutate(
       name = name %>% gsub("_S[1-3]", "",., perl = TRUE)
     ) %>% 
-    group_by(H, V, L, F, fla, la_stand, name) %>% 
+    group_by(H, V, L, F, fla, name) %>% 
     summarise_at(vars(absPAR_one_s, absPAR_two_s), mean)
 }
+
+
+
+
 

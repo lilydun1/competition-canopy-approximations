@@ -123,7 +123,6 @@ for(i in 1:nrow(combinations_stand_fla_0.1)) {
                     fla = combinations_stand_fla_0.1$fla[i], seed = combinations_stand_fla_0.1$S[i])
 }
 
-Plotstand(treesfile = "Trees.dat")
 for(i in 1:nrow(combinations_stand_fla_0.1)) {
   run_simulation(path = combinations_stand_fla_0.1$path[i])
 }
@@ -134,9 +133,15 @@ output_stand_fla_0.1 <- combinations_stand_fla_0.1$path %>%
 output_combined_stand_fla_0.1 <- combinations_stand_fla_0.1 %>% 
   left_join(output_stand_fla_0.1, by = "path")
 
-mn_outputs_stand_fla_0.1 <- output_combined_stand_fla_0.1 %>% 
+outputs_stand_fla_0.1 <- output_combined_stand_fla_0.1 %>% 
   group_by(H, V, L, F, fla, Tree, name) %>% 
   summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean) 
+
+mn_outputs_stand_fla_0.1 <- outputs_stand_fla_0.1 %>% 
+  group_by(H, V, L, F, fla, name) %>% 
+  summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), sum)
+
+write_csv(mn_outputs_stand_fla_0.1, "maespa_stand_fla_0.1.csv")
 
 #wet and dry 
 H <- c(15)
