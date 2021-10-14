@@ -31,7 +31,7 @@ load_trees <- function(path) {
 
 model_simp <- function(data) {
   df <- data %>% 
-    mutate(t_h = htcrown + httrunk) %>% 
+    mutate(t_h = htcrown + httrunk + rnorm(length(htcrown), 0, 0.01)) %>% 
     arrange(desc(t_h)) %>% 
     group_by(t_h, focal) %>% 
     summarise(larea = sum(larea)) %>% 

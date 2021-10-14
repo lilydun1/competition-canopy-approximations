@@ -1,7 +1,8 @@
 library(Metrics)
 names <- as_labeller(
-  c(`0` = "0 CV", `0.1` = "0.1 CV", `0.25` = "0.25 CV", `0.5` = "0.5 CV", 
-    `0.44` = "0.44 LAI", `1.521`= "1.429 LAI", `2.916`= "2.98 LAI", `4.556`= "4.238 LAI", `5.402`= "5.402 LAI")
+  c(`0` = "CV = 0", `0.1` = "CV = 0.1", `0.25` = "CV = 0.25", `0.5` = "CV = 0.5", 
+    `0.44` = "LAI = 0.44 ", `1.521`= "LAI = 1.43", `2.916`= "LAI = 2.98 ", 
+    `4.556`= "LAI = 4.24", `5.402`= "LAI = 5.40")
 )
 
 maespa_n_others_fla_0.1$model <- factor(maespa_n_others_fla_0.1$model, levels = c("MAESPA", "PPA", "FLAT TOP", "DEEP CROWN"))
@@ -10,12 +11,13 @@ maespa_n_others_c_fla$model <- factor(maespa_n_others_c_fla$model, levels = c("M
 
 #fla 0.1 
 maespa_n_others_fla_0.1 %>% 
+  mutate(absPAR_two_s = absPAR_two_s/0.1) %>% 
   select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
   ggplot(aes(F, absPAR_two_s)) + 
-  geom_point(aes(colour = as.factor(model))) + 
+  #geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(x = "Ratio focal tree height : stand", y = "Absorbed PAR (MJ tree-1 d-1)", 
+  labs(x = "\nRatio focal tree height : stand", y = "Absorbed PAR (MJ m-2 d-1)\n", 
        colour = "Canopy Approximation") +   
   scale_colour_manual(labels = c("MAESPA", "PPA" , "Flat Top","Deep Crown"), 
                       values = c("grey45","red", "#00BA38", "goldenrod2")) +
@@ -27,13 +29,17 @@ maespa_n_others_fla_0.1 %>%
     strip.background = element_rect(fill="white"), 
     panel.border = element_rect(colour = "grey45", fill = NA), 
     legend.key = element_rect(fill = "white"),
-    strip.text = element_text(family = "Helvetica", colour = "black", size = 9), 
+    strip.text = element_text(family = "Helvetica", colour = "black", size = 12), 
     axis.title = element_text(family = "Helvetica", colour = "black",
-                              size = 11), 
+                              size = 15), 
+    axis.text = element_text(family = "Helvetica", size = 10),
     legend.title= element_text(family = "Helvetica", colour = "black",
-                               size = 11),
-    legend.text = element_text(family = "Helvetica", colour = "black"),
-    legend.title.align	= 0.5) 
+                               size = 15),
+    legend.text = element_text(family = "Helvetica", colour = "black",
+                               size = 12),
+    legend.title.align	= 0.5) +
+  scale_x_continuous(limits = c(0, 2)) +
+  scale_y_continuous(limits = c(0, 6))
 
 maespa_n_others_fla_0.1 %>% 
   select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
@@ -61,6 +67,10 @@ predicted_DC_fla_0.1 <- maespa_n_others_fla_0.1 %>% filter(model == "DEEP CROWN"
 rmse(actual_fla_0.1$absPAR_two_s, predicted_ppa_fla_0.1$absPAR_two_s)
 rmse(actual_fla_0.1$absPAR_two_s, predicted_ft_fla_0.1$absPAR_two_s)
 rmse(actual_fla_0.1$absPAR_two_s, predicted_DC_fla_0.1$absPAR_two_s)
+
+cor(actual_fla_0.1$absPAR_two_s, predicted_ppa_fla_0.1$absPAR_two_s)^2
+cor(actual_fla_0.1$absPAR_two_s, predicted_ft_fla_0.1$absPAR_two_s)^2
+cor(actual_fla_0.1$absPAR_two_s, predicted_DC_fla_0.1$absPAR_two_s)^2
 
 #fla 27
 maespa_n_others_fla_27 %>% 
@@ -139,6 +149,10 @@ rmse(actual_c_fla$absPAR_two_s, predicted_ppa_c_fla$absPAR_two_s)
 rmse(actual_c_fla$absPAR_two_s, predicted_ft_c_fla$absPAR_two_s)
 rmse(actual_c_fla$absPAR_two_s, predicted_DC_c_fla$absPAR_two_s)
 
+cor(actual_c_fla$absPAR_two_s, predicted_ppa_c_fla$absPAR_two_s)^2
+cor(actual_c_fla$absPAR_two_s, predicted_ft_c_fla$absPAR_two_s)^2
+cor(actual_c_fla$absPAR_two_s, predicted_DC_c_fla$absPAR_two_s)^2
+
 
 #stand 0.1
 names_stand <- as_labeller(
@@ -181,12 +195,6 @@ rmse(actual_stand_fla_0.1$absPAR_two_s, predicted_ppa_stand_fla_0.1$absPAR_two_s
 rmse(actual_stand_fla_0.1$absPAR_two_s, predicted_ft_stand_fla_0.1$absPAR_two_s)
 rmse(actual_stand_fla_0.1$absPAR_two_s, predicted_DC_stand_fla_0.1$absPAR_two_s)
 
-rss_ppa <- sum((predicted_ppa_stand_fla_0.1$absPAR_two_s - actual_stand_fla_0.1$absPAR_two_s)^2)
-rss_ft <- sum((predicted_ft_stand_fla_0.1$absPAR_two_s - actual_stand_fla_0.1$absPAR_two_s)^2)
-rss_DC <- sum((predicted_DC_stand_fla_0.1$absPAR_two_s - actual_stand_fla_0.1$absPAR_two_s)^2)
-tss <- sum((actual_stand_fla_0.1$absPAR_two_s- mean(actual_stand_fla_0.1$absPAR_two_s))^2)
-rsq_ppa <- 1 - rss_ppa/tss
-rsq_ft <- 1 - rss_ft/tss
-rsq_DC <- 1 - rss_DC/tss
-
-
+cor(actual_stand_fla_0.1$absPAR_two_s, predicted_ppa_stand_fla_0.1$absPAR_two_s)^2
+cor(actual_stand_fla_0.1$absPAR_two_s, predicted_ft_stand_fla_0.1$absPAR_two_s)^2
+cor(actual_stand_fla_0.1$absPAR_two_s, predicted_DC_stand_fla_0.1$absPAR_two_s)^2
