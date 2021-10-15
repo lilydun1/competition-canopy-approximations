@@ -191,16 +191,16 @@ load_trees_stand <- function(path) {
                    diam = trees$indivdiam$values,  httrunk = trees$indivhttrunk$values, larea = trees$indivlarea$values, 
                    x = trees$xy$xycoords[seq(1, length(trees$xy$xycoords), by = 2)], 
                    y = trees$xy$xycoords[seq(2, length(trees$xy$xycoords), by = 2)],
-                   focal = ifelse(x > 75.37 & x < 120.63  & y > 75.37 & y < 120.63, TRUE, FALSE))
+                   focal = ifelse(x > 75.37 & x < 120.63  & y > 75.37 & y < 120.63, TRUE, FALSE)) #filtering the focal trees
   } else if(trees$plot$notrees == 2025) {
     data <- tibble(radx = trees$indivradx$values, rady =  trees$indivrady$values,  htcrown = trees$indivhtcrown$values, 
                    diam = trees$indivdiam$values,  httrunk = trees$indivhttrunk$values, larea = trees$indivlarea$values, 
                    x = trees$xy$xycoords[seq(1, length(trees$xy$xycoords), by = 2)], 
                    y = trees$xy$xycoords[seq(2, length(trees$xy$xycoords), by = 2)],
-                   focal = ifelse(x > 75.72 & x < 115.83  & y > 75.72 & y < 115.83, TRUE, FALSE))
+                   focal = ifelse(x > 75.72 & x < 115.83  & y > 75.72 & y < 115.83, TRUE, FALSE)) #filtering the focal trees
   }
   data <- data %>% 
-    filter(x > 27.999, x < 168.001, y > 27.999, y < 168.001)
+    filter(x > 27.999, x < 168.001, y > 27.999, y < 168.001) #filtering edge effects 
 }
 
 met_f <- function(L_ft) {
@@ -209,8 +209,8 @@ met_f <- function(L_ft) {
     as_tibble() %>% 
     select(time = TIME, PAR) %>%
     mutate(
-      PAR_one_s = 0.77 * PAR * exp(-0.77*L_ft),
-      PAR_two_s = 0.77*PAR*(exp(-0.77*L_ft) + (1- exp(-0.77*L_ft))*exp(-0.35*L_ft)), 
+      PAR_one_s = 0.77 * PAR * exp(-0.77*L_ft), #one stream
+      PAR_two_s = 0.77*PAR*(exp(-0.77*L_ft) + (1- exp(-0.77*L_ft))*exp(-0.35*L_ft)), #two stream 
       MJ_per_H_one_s = PAR_one_s * UMOLperStoMJperH, 
       MJ_per_H_two_s = PAR_two_s * UMOLperStoMJperH  # MJ
     )
@@ -294,13 +294,13 @@ deep_leaf_distribtuion_stand <- function(httrunk, htcrown = 6.36, radx = 2.54, r
 
 deep_crown_set_up_stand <- function(d) {
   LAI0.5_focal = c(34:37, 44:47, 54:57, 64:67)
-  LAI1.5_focal = c(115 :120 , 133 :138 , 151 :156 , 170 :175 , 187 :192 , 205 :210 )
-  LAI3_focal = c(244 :251 , 270 :277 , 296 :303 , 322 :329 , 348 :355 , 374 :381 , 
-                 400 :407 , 426 :433)
-  LAI4.5_focal = c(321 :330 , 352 :361 , 383 :392 , 414 :423 , 445 :454 , 476 :485 , 
-                   507 :516 , 538 :547 , 569 :578 , 600 :609)
-  LAI5.5_focal = c(433 :443 , 468 :478 , 503 :513 , 538:548, 573:583 , 608 :618 , 
-                   643 :653 , 678 :688 , 713 :723 , 748:758 , 783:793)
+  LAI1.5_focal = c(115:120, 133:138 , 151:156 , 170:175 , 187:192 , 205:210)
+  LAI3_focal = c(244:251, 270:277, 296:303, 322:329, 348:355, 374:381, 
+                 400:407, 426:433)
+  LAI4.5_focal = c(321:330, 352:361, 383:392, 414:423, 445:454, 476:485, 
+                   507:516, 538:547, 569:578, 600:609)
+  LAI5.5_focal = c(433:443, 468:478, 503:513, 538:548, 573:583, 608:618, 
+                   643:653, 678:688, 713:723, 748:758, 783:793)
   deep_crown_distribution <- 
     d$httrunk[1:nrow(d)] %>% 
     purrr::map(deep_leaf_distribtuion_stand) 
