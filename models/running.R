@@ -67,8 +67,8 @@ results_stand_fla_0.1 <-
   combinations_stand_fla_0.1 %>%
   mutate(
     model_conditions = map(f_trees, model_simp), 
-    ppa = map(model_conditions, PAR_calculator_ft_stand), 
-    ft = map(model_conditions, PAR_calculator_ppa_stand), 
+    ppa = map(model_conditions, PAR_calculator_ppa_stand), 
+    ft = map(model_conditions, PAR_calculator_ft_stand), 
     dc_slices = map(f_trees, deep_crown_set_up_stand), 
     dc = map(dc_slices, applying_DC_stand), 
     dc_m = map(dc, summarise_DC_stand)
