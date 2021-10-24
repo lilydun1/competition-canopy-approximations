@@ -74,7 +74,7 @@ results_stand_fla_0.1 <-
     dc_m = map(dc, summarise_DC_stand)
 )
 
-final_stand_fla_0.1 <- results_fla_0.1 %>% 
+final_stand_fla_0.1 <- results_stand_fla_0.1 %>% 
   select(H, V, L, F, fla, S, name)
 
 PPA_stand_fla_0.1 <- organising_results(results_stand_fla_0.1$ppa, final_stand_fla_0.1) %>% 

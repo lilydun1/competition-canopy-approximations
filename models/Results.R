@@ -39,10 +39,10 @@ final_results_fla_0.1 %>%
   scale_x_continuous(limits = c(0, 2)) +
   scale_y_continuous(limits = c(0, 6))
 
-actual_fla_0.1 <- maespa_n_others_fla_0.1 %>% filter(model == "MAESPA")
-predicted_ppa_fla_0.1 <- maespa_n_others_fla_0.1 %>% filter(model == "PPA")
-predicted_ft_fla_0.1 <- maespa_n_others_fla_0.1 %>% filter(model == "FLAT TOP")
-predicted_DC_fla_0.1 <- maespa_n_others_fla_0.1 %>% filter(model == "DEEP CROWN")
+actual_fla_0.1 <- final_results_fla_0.1 %>% filter(model == "MAESPA")
+predicted_ppa_fla_0.1 <- final_results_fla_0.1 %>% filter(model == "PPA")
+predicted_ft_fla_0.1 <- final_results_fla_0.1 %>% filter(model == "FLAT TOP")
+predicted_DC_fla_0.1 <- final_results_fla_0.1 %>% filter(model == "DEEP CROWN")
 
 rmse(actual_fla_0.1$absPAR_two_s, predicted_ppa_fla_0.1$absPAR_two_s)
 rmse(actual_fla_0.1$absPAR_two_s, predicted_ft_fla_0.1$absPAR_two_s)
