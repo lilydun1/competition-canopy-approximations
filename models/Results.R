@@ -61,10 +61,9 @@ names_c_fla <- as_labeller(
 final_results_c_fla %>% 
   select(F, absPAR_two_s, model, fla, L) %>%
   ggplot(aes(F, absPAR_two_s)) + 
-  geom_point(aes(colour = as.factor(model))) + 
   geom_line(aes(colour = as.factor(model))) + 
   facet_wrap(~fla, nrow = 2, labeller = names_c_fla) +
-  labs(x = "Ratio focal tree height : stand", y = "Absorbed PAR (MJ m-2 d-1)", colour = "Canopy Approximation") +  
+  labs(x = "\nRatio focal tree height : stand", y = "Absorbed PAR (MJ m-2 d-1)\n", colour = "Canopy Approximation") +  
   scale_colour_manual(labels = c("MAESPA", "PPA" , "Flat Top","Deep Crown"), 
                       values = c("grey45","red", "#00BA38", "goldenrod2")) +
   theme(
@@ -83,18 +82,20 @@ final_results_c_fla %>%
     legend.text = element_text(family = "Helvetica", colour = "black"),
     legend.title.align	= 0.5) 
 
-actual_c_fla <- maespa_n_others_c_fla %>% filter(model == "MAESPA")
-predicted_ppa_c_fla <- maespa_n_others_c_fla %>% filter(model == "PPA")
-predicted_ft_c_fla <- maespa_n_others_c_fla %>% filter(model == "FLAT TOP")
-predicted_DC_c_fla <- maespa_n_others_c_fla %>% filter(model == "DEEP CROWN")
+actual_0.1_c_fla <- final_results_c_fla %>% 
+  filter(model == "MAESPA", fla == 0.1)
+predicted_DC_0.1_c_fla <- final_results_c_fla %>% 
+  filter(model == "DEEP CROWN", fla == 0.1)
+actual_40_c_fla <- final_results_c_fla %>% 
+  filter(model == "MAESPA", fla == 40)
+predicted_DC_40_c_fla <- final_results_c_fla %>% 
+  filter(model == "DEEP CROWN", fla == 40)
 
-rmse(actual_c_fla$absPAR_two_s, predicted_ppa_c_fla$absPAR_two_s)
-rmse(actual_c_fla$absPAR_two_s, predicted_ft_c_fla$absPAR_two_s)
-rmse(actual_c_fla$absPAR_two_s, predicted_DC_c_fla$absPAR_two_s)
+rmse(actual_0.1_c_fla$absPAR_two_s, predicted_DC_0.1_c_fla$absPAR_two_s)
+rmse(actual_40_c_fla$absPAR_two_s, predicted_DC_40_c_fla$absPAR_two_s)
 
-cor(actual_c_fla$absPAR_two_s, predicted_ppa_c_fla$absPAR_two_s)^2
-cor(actual_c_fla$absPAR_two_s, predicted_ft_c_fla$absPAR_two_s)^2
-cor(actual_c_fla$absPAR_two_s, predicted_DC_c_fla$absPAR_two_s)^2
+cor(actual_0.1_c_fla$absPAR_two_s, predicted_DC_0.1_c_fla$absPAR_two_s)^2
+cor(actual_40_c_fla$absPAR_two_s, predicted_DC_40_c_fla$absPAR_two_s)^2
 
 #stand 0.1
 names_stand <- as_labeller(
