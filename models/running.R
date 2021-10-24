@@ -3,6 +3,10 @@ library(tidyverse)
 library(ggplot2)
 library(purrr)
 
+source("Function_M.R")
+
+options(dplyr.summarise.inform = FALSE)
+
 #fla 0.1
 H <- c(15)
 V <- c(0, 0.1, 0.25, 0.5)
