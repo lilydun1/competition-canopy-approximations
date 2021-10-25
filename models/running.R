@@ -7,7 +7,26 @@ source("Function_M.R")
 
 options(dplyr.summarise.inform = FALSE)
 
-#fla 0.1
+# load met forcing
+
+met <-  readmet(filename = "met.dat", nlines = -1) %>% 
+  as_tibble() %>% 
+  select(time = TIME, PAR)
+
+# fla 0.1
+
+#load MAESPA
+
+maespa_fla_0.1 <- 
+  read_csv("Different maespa csv/maespa_fla_0.1.csv") %>%
+  mutate(
+    absPAR_one_s = absPAR/0.1, 
+    absPAR_two_s = absPAR/0.1
+  ) %>% 
+  select(H, V, L, F, fla, name, absPAR_one_s, absPAR_two_s) %>% 
+  add_column(model = "MAESPA")
+
+# load simulations
 H <- c(15)
 V <- c(0, 0.1, 0.25, 0.5)
 L <- c(0.44, 1.521, 2.916, 4.556, 5.402)
@@ -16,42 +35,49 @@ F <- c(1.99, 1.85, 1.75, 1.60, 1.50, 1.35, 1.25, 1.15, 1.05, 1.00,
 fla <- c(0.1)
 S <- c(1, 2, 3)
 
-combinations_fla_0.1 <- expand_grid(H, V, L, F, fla, S) %>% 
+combinations_fla_0.1 <- 
+  expand_grid(H, V, L, F, fla, S) %>% 
   mutate(path = sprintf("simulations_fla_0.1/H%s_V%s_L%s_F%s_fla%s_S%s", H, V, L, F, fla, S)) %>% 
   add_column(name = basename(.$path)) %>% 
   mutate(trees = map(path, load_trees), 
-         f_trees = map(trees, focal_tree))
+         f_trees = map(trees, mark_focal_tree))
 
 results_fla_0.1 <- 
   combinations_fla_0.1 %>%
   mutate(
-  model_conditions = map(f_trees, model_simp), 
-  ppa = map(model_conditions, PAR_calculator_ppa), 
-  ft = map(model_conditions, PAR_calculator_ft), 
-  dc_slices = map(f_trees, deep_crown_set_up), 
-  dc = map(dc_slices, applying_DC), 
-  dc_m = map(dc, summarise_DC))
-
-final_fla_0.1 <- results_fla_0.1 %>% 
-  select(H, V, L, F, fla, S, name)
-
-PPA_fla_0.1 <- organising_results(results_fla_0.1$ppa, final_fla_0.1) %>% 
-  add_column(model = "PPA") 
-FT_fla_0.1 <- organising_results(results_fla_0.1$ft, final_fla_0.1) %>% 
-  add_column(model = "FLAT TOP")
-DC_fla_0.1 <- organising_results(results_fla_0.1$dc_m, final_fla_0.1) %>% 
-  add_column(model = "DEEP CROWN")
-
-maespa_fla_0.1 <- read_csv("maespa_fla_0.1.csv") 
-maespa_fla_0.1 <- maespa_fla_0.1 %>% 
+    models_lai = map(f_trees, model_lai)
+  ) %>%
+  unnest(models_lai) %>%
+  # calculate light PAR
   mutate(
-    absPAR_one_s = absPAR/0.1, 
-    absPAR_two_s = absPAR/0.1
-  ) %>% 
-  select(H, V, L, F, fla, name, absPAR_one_s, absPAR_two_s) %>% 
-  add_column(model = "MAESPA")
+    PAR_one_s = map(lai, PAR_calculator, stream = 1, met = met),
+    PAR_two_s = map(lai, PAR_calculator, stream = 2, met = met),
+    # integrate over the day using trapezoidal integration
+    absPAR_one_s = map_dbl(PAR_one_s, ~pracma::trapz(.x$time, .x$MJ_per_H))*larea,
+    absPAR_two_s = map_dbl(PAR_two_s, ~pracma::trapz(.x$time, .x$MJ_per_H))*larea
+  )
 
-final_results_fla_0.1 <- rbind(PPA_fla_0.1, FT_fla_0.1, DC_fla_0.1, maespa_fla_0.1)
+# Calculate totals for each plant in each simulation
+results_fla_0.1_mn <- 
+  results_fla_0.1 %>%
+  # sum over leaf segments (needed for deep crown, others only have 1 segment)
+  group_by(H, V, L, F, fla, S, name, model, t_h) %>%
+  summarise(
+    absPAR_one_s = sum(absPAR_one_s)/sum(larea), 
+    absPAR_two_s = sum(absPAR_two_s)/sum(larea)
+    ) %>%
+  ungroup() %>%
+ # average over replciate simulations S==1, S==2...
+  mutate(
+    name = name %>% gsub("_S[1-3]", "",., perl = TRUE)
+  ) %>% 
+  group_by(H, V, L, F, fla, name, model) %>% 
+  summarise_at(vars(absPAR_one_s, absPAR_two_s), mean) %>%
+  ungroup()
+
+final_results_fla_0.1 <- 
+  bind_rows(results_fla_0.1_mn, maespa_fla_0.1) %>%
+  arrange(name, model)
 
 #stand 
 H <- c(15)
@@ -124,7 +150,8 @@ results_c_fla <-
     ft = map(model_conditions, PAR_calculator_ft), 
     dc_slices = map(f_trees, deep_crown_set_up), 
     dc = map(dc_slices, applying_DC), 
-    dc_m = map(dc, summarise_DC))
+    dc_m = map(dc, summarise_DC)
+    )
 
 final_c_fla <- results_c_fla %>% 
   select(H, V, L, F, fla, S, name)
