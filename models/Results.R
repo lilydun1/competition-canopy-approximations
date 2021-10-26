@@ -21,23 +21,23 @@ final_results_fla_0.1 %>%
                       values = c("grey45","red", "#00BA38", "goldenrod2")) +
   theme(
     axis.ticks = element_line(colour = "grey"),
+    axis.title = element_text(family = "Helvetica", colour = "black",
+                              size = 15), 
+    axis.text = element_text(family = "Helvetica", size = 11),
+    legend.key = element_rect(fill = "white"),
+    legend.title= element_text(family = "Helvetica", colour = "black",
+                               size = 15),
+    legend.text = element_text(family = "Helvetica", colour = "black",
+                               size = 13),
+    legend.title.align	= 0.5,
+    panel.border = element_rect(colour = "grey45", fill = NA), 
     panel.grid.major = element_line(colour = "grey", size=0.1),
     panel.grid.minor = element_blank(), 
     panel.background = element_rect(fill = "white"),
     strip.background = element_rect(fill="white"), 
-    panel.border = element_rect(colour = "grey45", fill = NA), 
-    legend.key = element_rect(fill = "white"),
-    strip.text = element_text(family = "Helvetica", colour = "black", size = 12), 
-    axis.title = element_text(family = "Helvetica", colour = "black",
-                              size = 15), 
-    axis.text = element_text(family = "Helvetica", size = 11),
-    legend.title= element_text(family = "Helvetica", colour = "black",
-                               size = 15),
-    legend.text = element_text(family = "Helvetica", colour = "black",
-                               size = 12),
-    legend.title.align	= 0.5) +
-  scale_x_continuous(limits = c(0, 2)) +
-  scale_y_continuous(limits = c(0, 6))
+    strip.text = element_text(family = "Helvetica", colour = "black", size = 13)) +
+  scale_x_continuous(breaks = c(0, 0.5, 1, 1.5, 2), label = c(0, 0.5, 1, 1.5, 2)) +
+  scale_y_continuous(limits = c(0.9, 5.6))
 
 actual_fla_0.1 <- final_results_fla_0.1 %>% filter(model == "MAESPA")
 predicted_ppa_fla_0.1 <- final_results_fla_0.1 %>% filter(model == "PPA")
@@ -68,19 +68,24 @@ final_results_c_fla %>%
                       values = c("grey45","red", "#00BA38", "goldenrod2")) +
   theme(
     axis.ticks = element_line(colour = "grey"),
+    axis.title = element_text(family = "Helvetica", colour = "black",
+                              size = 15), 
+    axis.text = element_text(family = "Helvetica", size = 11),
+    legend.key = element_rect(fill = "white"),
+    legend.title= element_text(family = "Helvetica", colour = "black",
+                               size = 15),
+    legend.text = element_text(family = "Helvetica", colour = "black",
+                               size = 13),
+    legend.title.align	= 0.5,
+    panel.border = element_rect(colour = "grey45", fill = NA), 
     panel.grid.major = element_line(colour = "grey", size=0.1),
     panel.grid.minor = element_blank(), 
     panel.background = element_rect(fill = "white"),
     strip.background = element_rect(fill="white"), 
-    panel.border = element_rect(colour = "grey45", fill = NA), 
-    legend.key = element_rect(fill = "white"),
-    strip.text = element_text(family = "Helvetica", colour = "black", size = 9), 
-    axis.title = element_text(family = "Helvetica", colour = "black",
-                              size = 11), 
-    legend.title= element_text(family = "Helvetica", colour = "black",
-                               size = 11),
-    legend.text = element_text(family = "Helvetica", colour = "black"),
-    legend.title.align	= 0.5) 
+    strip.text = element_text(family = "Helvetica", colour = "black", size = 13))+
+  scale_x_continuous(breaks = c(0, 0.5, 1, 1.5, 2), label = c(0, 0.5, 1, 1.5, 2)) +
+  scale_y_continuous(limits = c(1.5, 5.6))
+
 
 actual_0.1_c_fla <- final_results_c_fla %>% 
   filter(model == "MAESPA", fla == 0.1)
@@ -113,20 +118,21 @@ final_results_stand_fla_0.1 %>%
                       values = c("grey45","red", "#00BA38", "goldenrod2")) +
   theme(
     axis.ticks = element_line(colour = "grey"),
+    axis.title = element_text(family = "Helvetica", colour = "black",
+                              size = 15), 
+    axis.text = element_text(family = "Helvetica", size = 11),
+    legend.key = element_rect(fill = "white"),
+    legend.title= element_text(family = "Helvetica", colour = "black",
+                               size = 15),
+    legend.text = element_text(family = "Helvetica", colour = "black",
+                               size = 13),
+    legend.title.align	= 0.5,
+    panel.border = element_rect(colour = "grey45", fill = NA), 
     panel.grid.major = element_line(colour = "grey", size=0.1),
     panel.grid.minor = element_blank(), 
     panel.background = element_rect(fill = "white"),
     strip.background = element_rect(fill="white"), 
-    panel.border = element_rect(colour = "grey45", fill = NA), 
-    legend.key = element_rect(fill = "white"),
-    strip.text = element_text(family = "Helvetica", colour = "black", size = 10), 
-    axis.title = element_text(family = "Helvetica", colour = "black",
-                              size = 13), 
-    axis.text = element_text(family = "Helvetica", size = 10),
-    legend.title= element_text(family = "Helvetica", colour = "black",
-                               size = 13),
-    legend.text = element_text(family = "Helvetica", colour = "black", size = 10),
-    legend.title.align	= 0.5) 
+    strip.text = element_text(family = "Helvetica", colour = "black", size = 13))
 
 actual_stand_fla_0.1 <- final_results_stand_fla_0.1 %>% filter(model == "MAESPA")
 predicted_ppa_stand_fla_0.1 <- final_results_stand_fla_0.1 %>% filter(model == "PPA")

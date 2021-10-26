@@ -20,7 +20,7 @@ results_fla_0.1 <-
                            0.95, 0.85, 0.75, 0.65, 0.50, 0.40, 0.25, 0.15, 0.01),
                      fla = c(0.1),
                      S = c(1, 2, 3),
-                     max_n = 100
+                     max_n = 1140
                      )
 
 results_fla_0.1_mn <- calculate_averages(results_fla_0.1)
@@ -42,7 +42,7 @@ results_stand_fla_0.1 <-
                      fla = c(0.1),
                      S = c(1, 2, 3),
                      stand = TRUE,
-                     max_n = 10
+                     max_n = 60
   )
 
 results_stand_fla_0.1_mn <- calculate_averages(results_stand_fla_0.1, per_leaf_area = FALSE)
