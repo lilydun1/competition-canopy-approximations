@@ -23,8 +23,15 @@ simulations folders = The MAESPA stands from the different computational experim
   * _fla_0.1 = Individual compeition with the focal tree with a 0.1 LA. <br />
   * _fla_27 = Individual compeition with the focal tree with a 27 LA. <br />
   * _stand_fla_0.1 = Whole stand light interception with the focal trees with 0.1 LA. <br />
-  * _stand_fla_27 = Whole stand light interception with the focal trees with 0.1 LA. <br />
+  * _stand_fla_27 = Whole stand light interception with the focal trees with 27 LA. <br />
 
+The syntax of the individual stands go like this:
+ * H#_V#_L#_F#_fla#_S#
+ * H = The average height of the stand 
+ * V = The coefficient of variation of the trunk heights of the stand. 
+ * L = The LAI of the stand, so correlates to how many trees there are.
+ * fla = The LA of the focal tree/trees.
+ * S = The seed or which random distribution the trunk heights were sampled from.
 
 ### models 
 Function_M.R = all the functions <br />
