@@ -25,21 +25,21 @@ simulations folders = The MAESPA stands from the different computational experim
   * _stand_fla_0.1 = Whole stand light interception with the focal trees with 0.1 LA. <br />
   * _stand_fla_27 = Whole stand light interception with the focal trees with 27 LA. <br />
 
-The syntax of the individual stands go like this:
+The syntax of the individual stands folders go like this:
  * H#_V#_L#_F#_fla#_S#
- * H = The average height of the stand 
+ * H = The average height of the stand. 
  * V = The coefficient of variation of the trunk heights of the stand. 
  * L = The LAI of the stand, so correlates to how many trees there are.
  * fla = The LA of the focal tree/trees.
  * S = The seed or which random distribution the trunk heights were sampled from.
 
 ### models 
-Function_M.R = all the functions <br />
-Results.R = for all the graphs <br />
-running.R = running all the functions and loading in the MAESPA outputs <br />
-simulations = copied from maespa simulations <br />
-met.dat = for getting the hourly PAR <br />
-Different maespa csv = all the maespa outputs as csvs <br />
+Function_M.R = The script with all the functions to parameterise the canopy approximations. <br />
+Results.R = The script with the graphs and statistical tests for the different experiments. Seperated into the different experiments for all the graphs/results. <br />
+running.R = The script on loading in the MAESPA outputs and running all the functions. Seperated into the different experiments. <br />
+simulations = Copied folders from the MAESPA simulations. All the stands that get loaded in. <br />
+met.dat = For getting the hourly PAR. <br />
+Different maespa csv = All the maespa outputs as csvs, named similarly to the simulations folder. <br />
 
 
 
