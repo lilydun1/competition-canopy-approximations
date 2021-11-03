@@ -1,7 +1,7 @@
 # Honours
 
 ## Description
-Honours project on how well canopy approximations used in large-scale vegetation models capture competition. 
+Honours project on how well canopy approximations used in large-scale vegetation models capture competition. There are three different experiments: compeition, whole light intercpetion and effects of self shading. 
 
 ## How to guide 
 1.  Go into the project Simulations then run the Function R script to load the functions then run the Sims R script to create the virtual tree folders and run the MAESPA simulations. 
