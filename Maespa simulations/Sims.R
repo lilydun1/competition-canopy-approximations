@@ -105,11 +105,11 @@ mn_outputs_c_fla <- output_combined_c_fla %>%
   group_by(H, V, L, F, fla, Tree, name) %>% 
   summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean)
 
-#whole stand as focal trees
+#whole stand as focal trees 0.1
 H <- c(15)
 V <- c(0, 0.1, 0.25, 0.5)
 L <- c(0.44, 1.521, 2.916, 4.556, 5.402)
-F <- c(1.00)
+F <- c(1)
 fla <- c(0.1)
 S <- c(1, 2, 3)
 
@@ -142,6 +142,46 @@ mn_outputs_stand_fla_0.1 <- outputs_stand_fla_0.1 %>%
   summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), sum)
 
 write_csv(mn_outputs_stand_fla_0.1, "maespa_stand_fla_0.1.csv")
+
+#whole stand as focal trees 27
+H <- c(15)
+V <- c(0, 0.1, 0.25, 0.5)
+L <- c(0.44, 1.521, 2.916, 4.556, 5.402)
+F <- c(1)
+fla <- c(27)
+S <- c(1, 2, 3)
+
+combinations_stand_fla_27 <- expand_grid(H, V, L, F, fla, S) %>% 
+  mutate(path = sprintf("simulations_stand_fla_27/H%s_V%s_L%s_F%s_fla%s_S%s", H, V, L, F, fla, S))
+
+for(i in 1:nrow(combinations_stand_fla_27)) {
+  create_simulation_f_stand(path = combinations_stand_fla_27$path[i], template = "template_A", 
+                            h_mn = combinations_stand_fla_27$H[i], h_cv = combinations_stand_fla_27$V[i], 
+                            LAI = combinations_stand_fla_27$L[i], ft_h = combinations_stand_fla_27$F[i], 
+                            fla = combinations_stand_fla_27$fla[i], seed = combinations_stand_fla_27$S[i])
+}
+
+for(i in 1:nrow(combinations_stand_fla_27)) {
+  run_simulation(path = combinations_stand_fla_27$path[i])
+}
+
+output_stand_fla_27 <- combinations_stand_fla_27$path %>% 
+  map_df(load_output)
+
+output_combined_stand_fla_27 <- combinations_stand_fla_27 %>% 
+  left_join(output_stand_fla_27, by = "path")
+
+outputs_stand_fla_27 <- output_combined_stand_fla_27 %>% 
+  group_by(H, V, L, F, fla, Tree, name) %>% 
+  summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), mean) 
+
+mn_outputs_stand_fla_27 <- outputs_stand_fla_27 %>% 
+  group_by(H, V, L, F, fla, name) %>% 
+  summarise_at(vars(absPAR, absNIR, absTherm, totPs, netPs, totRf, totLE1, totLE2, totH), sum)
+
+write_csv(mn_outputs_stand_fla_27, "maespa_stand_fla_27.csv")
+
+write_csv(outputs_stand_fla_27, "individuals_maespa_stand_fla_27.csv")
 
 #wet and dry 
 H <- c(15)

@@ -42,3 +42,12 @@ mn_stand_fla_0.1  %>%
   geom_line(aes(colour = as.factor(fla))) + 
   facet_grid(rows = vars(V), cols = vars(L)) +
   labs(x = "FT height", y = "Absorbed PAR", colour = "MAESPA")
+
+mn_outputs_stand_fla_27 %>% 
+  select(F, absPAR, H, V, L) %>% 
+  ggplot(aes(L, absPAR)) + 
+  geom_point(aes(colour = as.factor(fla))) + 
+  geom_line(aes(colour = as.factor(fla))) + 
+  facet_wrap(~V) +
+  labs(x = "FT height", y = "Absorbed PAR", colour = "MAESPA")
+
