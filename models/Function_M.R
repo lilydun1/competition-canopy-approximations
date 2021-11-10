@@ -37,7 +37,7 @@ process_experiment <- function(path, H, V, L, F, fla, S, stand = FALSE, max_n =1
     add_column(name = basename(.$path))  %>% 
     slice(1:max_n) %>%
     mutate(trees = map(path, load_trees), 
-           f_trees = map(trees, mark_focal_tree))
+           f_trees = map(trees, mark_focal_tree)) 
   
   results <- 
     combinations %>%
@@ -49,7 +49,7 @@ process_experiment <- function(path, H, V, L, F, fla, S, stand = FALSE, max_n =1
     mutate(
       PAR_one_s = map(lai, PAR_calculator, stream = 1, met = met),
       PAR_two_s = map(lai, PAR_calculator, stream = 2, met = met),
-      # integrate over the day using trapezoidal integration
+      # integrate over the day using trapezoidal integratio..n
       absPAR_one_s = map_dbl(PAR_one_s, ~pracma::trapz(.x$time, .x$MJ_per_H)),
       absPAR_two_s = map_dbl(PAR_two_s, ~pracma::trapz(.x$time, .x$MJ_per_H))
     )

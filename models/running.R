@@ -29,28 +29,31 @@ final_results_fla_0.1 <-
   bind_rows(results_fla_0.1_mn, maespa_fla_0.1) %>%
   arrange(name, model)
 
-#stand 
-maespa_stand_fla_0.1 <- load_maespa_results("Different maespa csv/maespa_stand_fla_0.1.csv", 
+write_csv(final_results_fla_0.1, "comp.csv")
+#stand 27 
+maespa_stand_fla_27 <- load_maespa_results("Different maespa csv/maespa_stand_fla_27.csv", 
                                             per_leaf_area = FALSE)
 
-results_stand_fla_0.1 <- 
-  process_experiment("simulations_stand_fla_0.1", 
+results_stand_fla_27 <- 
+  process_experiment("simulations_stand_fla_27", 
                      H = c(15),
                      V = c(0, 0.1, 0.25, 0.5),
                      L = c(0.44, 1.521, 2.916, 4.556, 5.402),
                      F = c(1.0),
-                     fla = c(0.1),
+                     fla = c(27),
                      S = c(1, 2, 3),
                      stand = TRUE,
                      max_n = 60
   )
 
-results_stand_fla_0.1_mn <- calculate_averages(results_stand_fla_0.1, per_leaf_area = FALSE)
+maespa_stand_fla_27 <- maespa_stand_fla_27 %>% 
+  mutate(absPAR_two_s = absPAR_two_s*1.35)
+  
+results_stand_fla_27_mn <- calculate_averages(results_stand_fla_27, per_leaf_area = FALSE)
 
-final_results_stand_fla_0.1 <- 
-  bind_rows(results_stand_fla_0.1_mn, maespa_stand_fla_0.1) %>%
+final_results_stand_fla_27 <- 
+  bind_rows(results_stand_fla_27_mn, maespa_stand_fla_27) %>%
   arrange(name, model)
-
 
 #setting up with different focal las
 maespa_c_fla <- load_maespa_results("Different maespa csv/maespa_c_fla.csv", 
@@ -66,6 +69,7 @@ results_c_fla <-
                      fla = c(0.1, 0.5, 1, 10, 20, 40),
                      S = c(1, 2, 3)
   )
+
 
 results_c_fla_mn <- calculate_averages(results_c_fla)
 
@@ -88,8 +92,29 @@ results_fla_27 <-
                      S = c(1, 2, 3)
   )
 
-results_fla_27_mn <- calculate_averages(results_fla_27)
-
 final_results_fla_27 <- 
   bind_rows(results_fla_27_mn, maespa_fla_27) %>%
+  arrange(name, model)
+
+#stand 0.1 
+maespa_stand_fla_0.1 <- load_maespa_results("Different maespa csv/maespa_stand_fla_0.1.csv", 
+                                            per_leaf_area = FALSE)
+
+results_stand_fla_0.1 <- 
+  process_experiment("simulations_stand_fla_0.1", 
+                     H = c(15),
+                     V = c(0, 0.1, 0.25, 0.5),
+                     L = c(0.44, 1.521, 2.916, 4.556, 5.402),
+                     F = c(1.0),
+                     fla = c(0.1),
+                     S = c(1, 2, 3),
+                     stand = TRUE,
+                     max_n = 60
+  )
+
+
+results_stand_fla_0.1_mn <- calculate_averages(results_stand_fla_0.1, per_leaf_area = FALSE)
+
+final_results_stand_fla_0.1 <- 
+  bind_rows(results_stand_fla_0.1_mn, maespa_stand_fla_0.1) %>%
   arrange(name, model)
