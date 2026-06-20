@@ -1,4 +1,17 @@
 library(Metrics)
+
+# figures are written to this folder as both PNG and PDF, and drawn to the
+# active device
+fig_dir <- "figures"
+dir.create(fig_dir, showWarnings = FALSE)
+
+save_fig <- function(plot, name, width = 9, height = 7) {
+  print(plot)
+  for (ext in c("png", "pdf"))
+    ggsave(file.path(fig_dir, paste0(name, ".", ext)), plot,
+           width = width, height = height, dpi = 300)
+}
+
 names <- as_labeller(
   c(`0` = "CV = 0", `0.1` = "CV = 0.1", `0.25` = "CV = 0.25", `0.5` = "CV = 0.5", 
     `0.44` = "LAI = 0.44 ", `1.521`= "LAI = 1.43", `2.916`= "LAI = 2.98 ", 
@@ -9,11 +22,13 @@ final_results_fla_0.1$model <- factor(final_results_fla_0.1$model, levels = c("M
 final_results_stand_fla_0.1$model <- factor(final_results_stand_fla_0.1$model, levels = c("MAESPA", "PPA", "FLAT TOP", "DEEP CROWN"))
 final_results_stand_fla_27$model <- factor(final_results_stand_fla_27$model, levels = c("MAESPA", "PPA", "FLAT TOP", "DEEP CROWN"))
 final_results_c_fla$model <- factor(final_results_c_fla$model, levels = c("MAESPA", "PPA", "FLAT TOP", "DEEP CROWN"))
+final_results_fla_27$model <- factor(final_results_fla_27$model, levels = c("MAESPA", "PPA", "FLAT TOP", "DEEP CROWN"))
 
-#fla 0.1 
-final_results_fla_0.1 %>% 
+#fla 0.1
+fig_competition_fla_0.1 <-
+final_results_fla_0.1 %>%
   select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
-  ggplot(aes(F, absPAR_two_s)) + 
+  ggplot(aes(F, absPAR_two_s)) +
   geom_line(aes(colour = as.factor(model))) + 
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
   labs(x = "\nRatio focal tree height : stand", y = "Absorbed PAR (MJ m-2 d-1)\n", 
@@ -40,6 +55,8 @@ final_results_fla_0.1 %>%
   scale_x_continuous(breaks = c(0, 0.5, 1, 1.5, 2), label = c(0, 0.5, 1, 1.5, 2)) +
   scale_y_continuous(limits = c(0.9, 5.6))
 
+save_fig(fig_competition_fla_0.1, "competition_fla_0.1", width = 9, height = 7)
+
 actual_fla_0.1 <- final_results_fla_0.1 %>% filter(model == "MAESPA")
 predicted_ppa_fla_0.1 <- final_results_fla_0.1 %>% filter(model == "PPA")
 predicted_ft_fla_0.1 <- final_results_fla_0.1 %>% filter(model == "FLAT TOP")
@@ -59,10 +76,11 @@ names_c_fla <- as_labeller(
     `10` = "Focal LA = 10", `20` = "Focal LA = 20", `40` = "Focal LA = 40")
 )
 
-final_results_c_fla %>% 
+fig_selfshading_all <-
+final_results_c_fla %>%
   select(F, absPAR_two_s, model, fla, L) %>%
-  ggplot(aes(F, absPAR_two_s)) + 
-  geom_line(aes(colour = as.factor(model))) + 
+  ggplot(aes(F, absPAR_two_s)) +
+  geom_line(aes(colour = as.factor(model))) +
   facet_wrap(~fla, nrow = 2, labeller = names_c_fla) +
   labs(x = "\nRatio focal tree height : stand", y = "Absorbed PAR (MJ m-2 d-1)\n", colour = "Canopy Approximation") +  
   scale_colour_manual(labels = c("MAESPA", "PPA" , "Flat Top","Deep Crown"), 
@@ -87,13 +105,16 @@ final_results_c_fla %>%
   scale_x_continuous(breaks = c(0, 0.5, 1, 1.5, 2), label = c(0, 0.5, 1, 1.5, 2)) +
   scale_y_continuous(limits = c(1.5, 5.6))
 
+save_fig(fig_selfshading_all, "selfshading_c_fla", width = 9, height = 7)
+
 
 thing <- c(0.1, 40)
 
-final_results_c_fla %>% 
+fig_selfshading_0.1_40 <-
+final_results_c_fla %>%
   select(F, absPAR_two_s, model, fla, L) %>%
-  filter(fla %in% thing) %>% 
-  ggplot(aes(F, absPAR_two_s)) + 
+  filter(fla %in% thing) %>%
+  ggplot(aes(F, absPAR_two_s)) +
   geom_line(aes(colour = as.factor(model))) + 
   facet_wrap(~fla, nrow = 1, labeller = names_c_fla) +
   labs(x = "\nRatio focal tree height : stand", y = "Absorbed PAR (MJ m-2 d-1)\n", colour = "Canopy Approximation") +  
@@ -116,7 +137,9 @@ final_results_c_fla %>%
     panel.background = element_rect(fill = "white"),
     strip.background = element_rect(fill="white"), 
     strip.text = element_text(family = "Helvetica", colour = "black", size = 13)) +
-   scale_x_continuous(breaks = c(0, 0.5, 1, 1.5, 2), label = c(0, 0.5, 1, 1.5, 2)) 
+   scale_x_continuous(breaks = c(0, 0.5, 1, 1.5, 2), label = c(0, 0.5, 1, 1.5, 2))
+
+save_fig(fig_selfshading_0.1_40, "selfshading_c_fla_0.1_40", width = 9, height = 5)
 
 mode_thing <- c("PPA", "FLAT TOP", "DEEP CROWN")
 
@@ -137,8 +160,9 @@ df_maespa <- final_results_c_fla %>%
 df_ppo <- df_PPA %>% 
   add_column(diff = df_PPA$absPAR_two_s - df_maespa$absPAR_two_s)
 
-df_ppo %>% 
-  ggplot(aes(fla, diff)) + 
+fig_selfshading_diff <-
+df_ppo %>%
+  ggplot(aes(fla, diff)) +
   geom_line(aes(colour = as.factor(L)))  +
   labs(x = "\n Focal tree LA (m2)", y = "Mean difference of absorbed PAR (MJ m-2 d-1)\n", colour = "Canopy Approximation") +
   scale_colour_manual(values = c("darkgreen")) +
@@ -158,10 +182,12 @@ df_ppo %>%
     legend.text = element_text(family = "Helvetica", colour = "black",
                                size = 12),
     legend.title.align	= 0.5)  +
-  scale_y_continuous(breaks = c(0, 0.5, 1, 1.5, 2), label = c(0, 0.5, 1, 1.5, 2)) 
+  scale_y_continuous(breaks = c(0, 0.5, 1, 1.5, 2), label = c(0, 0.5, 1, 1.5, 2))
+
+save_fig(fig_selfshading_diff, "selfshading_deepcrown_diff", width = 7, height = 5)
 
 
-actual_0.1_c_fla <- final_results_c_fla %>% 
+actual_0.1_c_fla <- final_results_c_fla %>%
   filter(model == "MAESPA", fla == 0.1)
 predicted_DC_0.1_c_fla <- final_results_c_fla %>% 
   filter(model == "DEEP CROWN", fla == 0.1)
@@ -202,9 +228,10 @@ names_stand <- as_labeller(
     `0.5` = "CV = 0.5"))
 
 
-final_results_stand_fla_27 %>% 
+fig_stand_fla_27 <-
+final_results_stand_fla_27 %>%
   select(absPAR_two_s, model, V, L) %>%
-  ggplot(aes(L, absPAR_two_s)) + 
+  ggplot(aes(L, absPAR_two_s)) +
   geom_line(aes(colour = as.factor(model))) + 
   facet_wrap(~V, labeller = names_stand) +
   labs(x = "\nLAI", y = "Absorbed PAR (MJ m-2 d-1)\n", 
@@ -228,6 +255,8 @@ final_results_stand_fla_27 %>%
     panel.background = element_rect(fill = "white"),
     strip.background = element_rect(fill="white"), 
     strip.text = element_text(family = "Helvetica", colour = "black", size = 13))
+
+save_fig(fig_stand_fla_27, "stand_interception_fla_27", width = 8, height = 7)
 
 actual_stand_fla_27 <- final_results_stand_fla_27 %>% filter(model == "MAESPA")
 predicted_ppa_stand_fla_27 <- final_results_stand_fla_27 %>% filter(model == "PPA")
@@ -248,9 +277,10 @@ names_stand <- as_labeller(
   c(`0` = "CV = 0", `0.1` = "CV = 0.1", `0.25` = "CV = 0.25", 
     `0.5` = "CV = 0.5"))
 
-final_results_stand_fla_0.1 %>% 
+fig_stand_fla_0.1 <-
+final_results_stand_fla_0.1 %>%
   select(absPAR_two_s, model, V, L) %>%
-  ggplot(aes(L, absPAR_two_s)) + 
+  ggplot(aes(L, absPAR_two_s)) +
   geom_line(aes(colour = as.factor(model))) + 
   facet_wrap(~V, labeller = names_stand) +
   labs(x = "\nLAI", y = "Absorbed PAR (MJ m-2 d-1)\n", 
@@ -275,6 +305,8 @@ final_results_stand_fla_0.1 %>%
     strip.background = element_rect(fill="white"), 
     strip.text = element_text(family = "Helvetica", colour = "black", size = 13))
 
+save_fig(fig_stand_fla_0.1, "stand_interception_fla_0.1", width = 8, height = 7)
+
 actual_stand_fla_0.1 <- final_results_stand_fla_0.1 %>% filter(model == "MAESPA")
 predicted_ppa_stand_fla_0.1 <- final_results_stand_fla_0.1 %>% filter(model == "PPA")
 predicted_ft_stand_fla_0.1 <- final_results_stand_fla_0.1 %>% filter(model == "FLAT TOP")
@@ -289,11 +321,14 @@ cor(actual_stand_fla_0.1$absPAR_two_s, predicted_ft_stand_fla_0.1$absPAR_two_s)^
 cor(actual_stand_fla_0.1$absPAR_two_s, predicted_DC_stand_fla_0.1$absPAR_two_s)^2
 
 #fla 27
-maespa_n_others_fla_27 %>% 
+fig_competition_fla_27 <-
+final_results_fla_27 %>%
   select(F, absPAR_two_s, absPAR_one_s, model, V, L) %>%
-  ggplot(aes(F, absPAR_two_s)) + 
-  geom_point(aes(colour = as.factor(model))) + 
-  geom_line(aes(colour = as.factor(model))) + 
+  ggplot(aes(F, absPAR_two_s)) +
+  geom_point(aes(colour = as.factor(model))) +
+  geom_line(aes(colour = as.factor(model))) +
   facet_grid(rows = vars(V), cols = vars(L), labeller = names) +
-  labs(title = "two stream - fla 27", x = "Ratio focal tree height : stand", y = "Absorbed PAR (MJ tree-1 d-1)", 
-       colour = "Canopy Approximation") 
+  labs(title = "two stream - fla 27", x = "Ratio focal tree height : stand", y = "Absorbed PAR (MJ tree-1 d-1)",
+       colour = "Canopy Approximation")
+
+save_fig(fig_competition_fla_27, "competition_fla_27", width = 9, height = 7)

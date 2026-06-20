@@ -3,3 +3,8 @@
 .Rhistory
 .DS_Store
 .Rproj.user/
+CLAUDE.md
+.vscode/settings.json
+
+# Regenerable figure outputs (created by models/Results.R)
+models/figures/
