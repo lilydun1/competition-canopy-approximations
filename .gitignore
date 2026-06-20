@@ -1,3 +1,5 @@
+# R / RStudio / macOS cruft (added by project-cleanup)
+.RData
+.Rhistory
 .DS_Store
-.Rproj.user
-Maespa simulations/R/Function.R
+.Rproj.user/
