@@ -57,6 +57,35 @@ final_results_fla_0.1 %>%
 
 save_fig(fig_competition_fla_0.1, "competition_fla_0.1", width = 9, height = 7)
 
+# single stand from the grid above (LAI 2.98, CV 0.25), drawn with lines like the
+# grid so that stepwise behaviour is not introduced by the plotting
+fig_individual_competition <-
+final_results_fla_0.1 %>%
+  filter(L == 2.916, V == 0.25) %>%
+  ggplot(aes(F, absPAR_two_s)) +
+  geom_vline(xintercept = 1, linetype = "dashed") +
+  geom_line(aes(colour = as.factor(model)), linewidth = 0.8) +
+  labs(x = "\nRatio focal tree height : stand", y = "Absorbed PAR (MJ m-2 d-1)\n",
+       colour = "Canopy Approximation") +
+  scale_colour_manual(labels = c("MAESPA", "PPA" , "Flat Top","Deep Crown"),
+                      values = c("grey45","red", "#00BA38", "goldenrod2")) +
+  theme(
+    axis.ticks = element_line(colour = "grey"),
+    axis.title = element_text(family = "Helvetica", colour = "black", size = 15),
+    axis.text = element_text(family = "Helvetica", size = 11),
+    legend.key = element_rect(fill = "white"),
+    legend.title= element_text(family = "Helvetica", colour = "black", size = 15),
+    legend.text = element_text(family = "Helvetica", colour = "black", size = 13),
+    legend.title.align	= 0.5,
+    panel.border = element_rect(colour = "grey45", fill = NA),
+    panel.grid.major = element_line(colour = "grey", size=0.1),
+    panel.grid.minor = element_blank(),
+    panel.background = element_rect(fill = "white")) +
+  scale_x_continuous(breaks = c(0, 0.5, 1, 1.5, 2), label = c(0, 0.5, 1, 1.5, 2)) +
+  scale_y_continuous(limits = c(0, 6))
+
+save_fig(fig_individual_competition, "individual_competition", width = 9, height = 5)
+
 actual_fla_0.1 <- final_results_fla_0.1 %>% filter(model == "MAESPA")
 predicted_ppa_fla_0.1 <- final_results_fla_0.1 %>% filter(model == "PPA")
 predicted_ft_fla_0.1 <- final_results_fla_0.1 %>% filter(model == "FLAT TOP")
@@ -117,13 +146,14 @@ final_results_c_fla %>%
   ggplot(aes(F, absPAR_two_s)) +
   geom_line(aes(colour = as.factor(model))) + 
   facet_wrap(~fla, nrow = 1, labeller = names_c_fla) +
-  labs(x = "\nRatio focal tree height : stand", y = "Absorbed PAR (MJ m-2 d-1)\n", colour = "Canopy Approximation") +  
-  scale_colour_manual(labels = c("MAESPA", "PPA" , "Flat Top","Deep Crown"), 
+  labs(x = "\nRatio focal tree height : stand", y = "Absorbed PAR (MJ m-2 d-1)\n", colour = "Canopy Approximation",
+       tag = "(a)") +
+  scale_colour_manual(labels = c("MAESPA", "PPA" , "Flat Top","Deep Crown"),
                       values = c("grey45","red", "#00BA38", "goldenrod2")) +
   theme(
     axis.ticks = element_line(colour = "grey"),
     axis.title = element_text(family = "Helvetica", colour = "black",
-                              size = 15), 
+                              size = 15),
     axis.text = element_text(family = "Helvetica", size = 11),
     legend.key = element_rect(fill = "white"),
     legend.title= element_text(family = "Helvetica", colour = "black",
@@ -131,11 +161,12 @@ final_results_c_fla %>%
     legend.text = element_text(family = "Helvetica", colour = "black",
                                size = 13),
     legend.title.align	= 0.5,
-    panel.border = element_rect(colour = "grey45", fill = NA), 
+    plot.tag = element_text(family = "Helvetica", size = 16),
+    panel.border = element_rect(colour = "grey45", fill = NA),
     panel.grid.major = element_line(colour = "grey", size=0.1),
-    panel.grid.minor = element_blank(), 
+    panel.grid.minor = element_blank(),
     panel.background = element_rect(fill = "white"),
-    strip.background = element_rect(fill="white"), 
+    strip.background = element_rect(fill="white"),
     strip.text = element_text(family = "Helvetica", colour = "black", size = 13)) +
    scale_x_continuous(breaks = c(0, 0.5, 1, 1.5, 2), label = c(0, 0.5, 1, 1.5, 2))
 
@@ -163,9 +194,10 @@ df_ppo <- df_PPA %>%
 fig_selfshading_diff <-
 df_ppo %>%
   ggplot(aes(fla, diff)) +
-  geom_line(aes(colour = as.factor(L)))  +
-  labs(x = "\n Focal tree LA (m2)", y = "Mean difference of absorbed PAR (MJ m-2 d-1)\n", colour = "Canopy Approximation") +
-  scale_colour_manual(values = c("darkgreen")) +
+  geom_line(colour = "darkgreen")  +
+  labs(x = "\n Focal tree LA (m2)",
+       y = "Deep Crown minus MAESPA,\nabsorbed PAR (MJ m-2 d-1)\n",
+       tag = "(b)") +
   theme(
     axis.ticks = element_line(colour = "grey"),
     axis.text = element_text(family = "Helvetica", size = 11),
@@ -181,7 +213,8 @@ df_ppo %>%
                                size = 15),
     legend.text = element_text(family = "Helvetica", colour = "black",
                                size = 12),
-    legend.title.align	= 0.5)  +
+    legend.title.align	= 0.5,
+    plot.tag = element_text(family = "Helvetica", size = 16))  +
   scale_y_continuous(breaks = c(0, 0.5, 1, 1.5, 2), label = c(0, 0.5, 1, 1.5, 2))
 
 save_fig(fig_selfshading_diff, "selfshading_deepcrown_diff", width = 7, height = 5)
