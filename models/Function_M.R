@@ -332,3 +332,54 @@ calibrate_light <- function(lai_tab, maespa, G, stream = 2) {
     sse(c(a = a, w = plogis(q[1]), ka = exp(q[2]), kb = exp(q[3]))))$par
   c(a = a, w = plogis(q[1]), ka = exp(q[2]), kb = exp(q[3]))
 }
+
+## ---------------------------------------------------------------------------
+## Approximation curves at arbitrary focal heights (for plotting)
+## ---------------------------------------------------------------------------
+## Within a replicate, the stand is identical for every focal-height ratio F
+## (same seed); only the focal tree's trunk height (15 m x F) changes. The
+## approximations depend only on the leaf area above the focal tree, so they can
+## be evaluated at any F from a single stand. Each stand is sorted once and the
+## leaf area above the focal tree is then looked up for every F, reproducing
+## model_lai_2026() (up to the random tie-breaking it applies to equal heights).
+approx_curve_stand <- function(path, F_grid, fla, p, G, h_mn = 15) {
+  d <- load_trees_2026(path)
+  area <- stand_area(d)
+  focal <- d[d$focal, ]
+  st <- d[!d$focal, ] %>% mutate(top = httrunk + htcrown, ca = pi * radx * rady) %>% arrange(desc(top))
+  st <- st %>% mutate(cum_la = cumsum(larea), cum_ca = cumsum(ca),
+                      layer = floor((cum_ca - ca) / area))
+  top_desc <- st$top
+  ## Deep Crown: all stand slices, sorted by height, with cumulative leaf area
+  sl <- st %>% mutate(s = purrr::pmap(list(httrunk, htcrown, radx, rady, larea), deep_leaf_distribtuion)) %>%
+    select(s) %>% unnest(s) %>% arrange(h)
+  sl_h <- sl$h; sl_above <- rev(cumsum(rev(sl$larea_slice)))   # leaf area at or above each slice
+  la_above_h <- function(h) {                                     # stand leaf area strictly above h
+    i <- findInterval(h, sl_h)                                    # number of slices with height <= h
+    ifelse(i >= length(sl_h), 0, sl_above[i + 1])
+  }
+  map_dfr(F_grid, function(F) {
+    trunk <- h_mn * F
+    top <- trunk + focal$htcrown
+    k <- sum(top_desc > top)                                      # stand trees taller than the focal
+    lai_ft <- ((if (k > 0) st$cum_la[k] else 0) + fla) / area
+    fl <- floor((if (k > 0) st$cum_ca[k] else 0) / area)          # focal's PPA layer
+    m <- sum(st$layer < fl)
+    lai_ppa <- (if (m > 0) st$cum_la[m] else 0) / area
+    fs <- deep_leaf_distribtuion(trunk, focal$htcrown, focal$radx, focal$rady, fla) %>% arrange(desc(h))
+    lai_dc <- (la_above_h(fs$h) + cumsum(fs$larea_slice)) / area
+    tibble(F = F, model = c("FLAT TOP", "PPA", "DEEP CROWN"),
+           absPAR = c(absorb(lai_ft, p, G), absorb(lai_ppa, p, G),
+                      sum(absorb(lai_dc, p, G) * fs$larea_slice) / sum(fs$larea_slice)))
+  })
+}
+
+## Curves for a set of stands (one stand per V, L, fla, S; built at F = 1),
+## averaged over replicates
+approx_curves_2026 <- function(folder, stands, F_grid, p, G) {
+  stands %>%
+    mutate(path = sprintf("%s/H%s_V%s_L%s_F1_fla%s_S%s", folder, H, V, L, fla, S),
+           curve = purrr::pmap(list(path, fla), function(path, fla) approx_curve_stand(path, F_grid, fla, p, G))) %>%
+    select(-path) %>% unnest(curve) %>%
+    group_by(H, V, L, fla, F, model) %>% summarise(absPAR = mean(absPAR), .groups = "drop")
+}

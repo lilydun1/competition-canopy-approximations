@@ -81,6 +81,27 @@ stats <- bind_rows(stats, stats1)
 write_csv(stats, "stats2026.csv")
 print(stats %>% mutate(across(c(R2, RMSE), ~ round(.x, 3))))
 
+## ---- approximation curves at fine focal-height steps (for plotting) ----------
+## The statistics above use the 19 heights at which MAESPA was run. For the
+## figures, the approximations are evaluated every 0.005 in height ratio so that
+## their steps are drawn where they occur; MAESPA is drawn through its 19 runs.
+F_fine <- seq(0.01, 1.99, by = 0.005)
+if (file.exists("curves2026.rds")) {
+  curves <- readRDS("curves2026.rds")
+} else {
+  message("computing fine-step approximation curves ...")
+  curves <- list(
+    comp = approx_curves_2026(file.path(sims, "simulations2026_fla_0.1"),
+      expand_grid(H = 15, V = c(0, 0.1, 0.25, 0.5), L = L_vals, fla = 0.1, S = 1:3), F_fine, light, G),
+    ss = approx_curves_2026(file.path(sims, "simulations2026_c_fla"),
+      expand_grid(H = 15, V = 0.1, L = 2.97, fla = c(0.1, 0.5, 1, 10, 20, 40), S = 1:3), F_fine, light, G))
+  saveRDS(curves, "curves2026.rds")
+}
+as_plot <- function(curve, res) bind_rows(curve, filter(res, model == "MAESPA")) %>%
+  mutate(model = factor(model, levels = c("MAESPA", "PPA", "FLAT TOP", "DEEP CROWN")))
+plot_comp <- as_plot(curves$comp, res_comp)
+plot_ss   <- as_plot(curves$ss, res_ss)
+
 ## ---- figures -----------------------------------------------------------------
 cols <- c("grey45", "red", "#00BA38", "goldenrod2")
 model_labels <- c("MAESPA", "PPA", "Flat Top", "Deep Crown")
@@ -115,14 +136,14 @@ lai_lab <- as_labeller(c(setNames(paste("LAI =", formatC(L_vals, format = "f", d
 
 ## Fig. compositions: all stands
 save_fig(
-  ggplot(res_comp, aes(F, absPAR, colour = model)) + geom_line() +
+  ggplot(plot_comp, aes(F, absPAR, colour = model)) + geom_line() +
     facet_grid(rows = vars(V), cols = vars(L), labeller = lai_lab) +
     lab_par + scale_models + x_ratio + theme_canopy,
   "competition_fla_0.1", 11, 8)
 
 ## Fig. individual: one stand (LAI 2.97, CV 0.25)
 save_fig(
-  ggplot(filter(res_comp, L == 2.97, V == 0.25), aes(F, absPAR, colour = model)) +
+  ggplot(filter(plot_comp, L == 2.97, V == 0.25), aes(F, absPAR, colour = model)) +
     geom_vline(xintercept = 1, linetype = "dashed") + geom_line(linewidth = 0.8) +
     lab_par + scale_models + x_ratio + scale_y_continuous(limits = c(0, 6)) + theme_canopy,
   "individual-competition", 9, 5)
@@ -130,12 +151,12 @@ save_fig(
 ## Fig. self-shading (a): focal LA 0.1 vs 40; SI: all focal LA
 fla_lab <- as_labeller(function(x) paste("Focal LA =", x, "m²"))
 save_fig(
-  ggplot(filter(res_ss, fla %in% c(0.1, 40)), aes(F, absPAR, colour = model)) + geom_line() +
+  ggplot(filter(plot_ss, fla %in% c(0.1, 40)), aes(F, absPAR, colour = model)) + geom_line() +
     facet_wrap(~fla, nrow = 1, labeller = fla_lab) + labs(tag = "(a)") +
     lab_par + scale_models + x_ratio + theme_canopy,
   "selfshading_c_fla_0.1_40", 9, 5)
 save_fig(
-  ggplot(res_ss, aes(F, absPAR, colour = model)) + geom_line() +
+  ggplot(plot_ss, aes(F, absPAR, colour = model)) + geom_line() +
     facet_wrap(~fla, nrow = 2, labeller = fla_lab) +
     lab_par + scale_models + x_ratio + theme_canopy,
   "selfshading_c_fla", 10, 7)
