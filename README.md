@@ -21,6 +21,21 @@ experiments are run:
 (`fla` = focal-tree leaf area: 0.1 m² for a "single-leaf" focal tree, 27 m² for a
 full-canopy one.)
 
+## 2026 rerun (used in the paper)
+
+The paper uses a rerun of the competition and self-shading experiments, made in November 2026 after two problems were found in the first round. Both affect only the MAESPA stands, not the `plant` dynamic-model experiments.
+
+1. **Stand area and LAI.** `create_trees()` set the number of trees from a 12,000 m² plot but placed them over 196 × 196 m (38,416 m²), and `Function_M.R` computed LAI with a 6,123 m² denominator. Realised LAI was about 0.3× the stated values (0.12–1.62 rather than 0.44–5.40), and the approximations were fed the stated values.
+2. **MAESPA's tree limit.** MAESPA is compiled with `MAXT = 1500`. The two densest stands (2,025 and 2,401 trees) exceeded it, so MAESPA dropped trees, regenerated the coordinates on its own grid and scattered the edge-wall trees through the stand; their focal-tree results were off by 8–20%. See `Maespa simulations/src/README.md`.
+
+What the rerun does:
+
+- `Maespa simulations/Sims_2026.R` builds complete n × n grids on the 196 m plot (n = 26, 46, 66, 79, 89 trees per row; realised LAI 0.44, 1.42, 2.97, 4.28, 5.44) with Lily's trees, wall, height CVs, seeds and focal-height ratios, and runs `src/maespa-maxt10000` (MAESPA built with `MAXT = 10000`). It stops if any run reports the tree-limit warning. Outputs: `simulations2026_fla_0.1/`, `simulations2026_c_fla/`, `maespa2026_*.csv`.
+- `models/analysis_2026.R` computes the approximations with LAI from the realised ground area per tree, PPA layers by cumulative crown area (Strigul et al. 2008), and a two-component light model fitted to MAESPA at the full-light and deep-shade extremes only (`light2026.csv`). It writes `results2026_*.csv`, `stats2026.csv` and the paper's Stage-1 figures (set `MS_FIG_DIR` to also write them to the manuscript).
+- `Maespa simulations/R/render_stand.R` renders stands for the manuscript figure without a display.
+
+The first-round scripts (`Sims.R`, `running.R`, `Results.R`) and their outputs are kept unchanged for reference.
+
 ## Repository structure
 
 The repo is **two independent RStudio projects**. Scripts use relative paths and

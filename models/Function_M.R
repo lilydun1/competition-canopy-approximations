@@ -215,3 +215,120 @@ deep_crown_set_up <- function(d) {
 
 
 
+
+## ===========================================================================
+## 2026 rerun (simulations2026_*; see ../Maespa simulations/Sims_2026.R)
+## ---------------------------------------------------------------------------
+## Changes from the functions above, which are kept so the first-round analysis
+## remains reproducible:
+##   - the focal tree is read from confile.dat (itargets) rather than matched on
+##     hard-coded coordinates;
+##   - LAI is computed from the realised ground area per tree (inner trees x
+##     spacing^2) rather than a fixed 6123 m², which did not match the geometry;
+##   - PPA layers are defined by cumulative crown area (Strigul et al. 2008): a
+##     tree's layer is the number of complete canopy layers (crown area = ground
+##     area) formed by taller trees, and it receives the light below them;
+##   - light coefficients k1, k2 are arguments (fitted to MAESPA, see
+##     calibrate_light()).
+## ===========================================================================
+
+load_trees_2026 <- function(path) {
+  focal <- parseFile(file.path(path, "confile.dat"))$treescon$itargets
+  load_trees(path) %>% mutate(focal = tree_num == focal)
+}
+
+## ground area represented by the inner trees: n_inner x spacing^2
+stand_area <- function(data) {
+  nrow(data) * median(diff(sort(unique(data$x))))^2
+}
+
+model_lai_2026 <- function(data) {
+  area <- stand_area(data)
+
+  ordered <- data %>%
+    mutate(t_h = htcrown + httrunk + rnorm(n(), 0, 0.01)) %>%  # jitter breaks ties
+    arrange(desc(t_h)) %>%
+    mutate(crown_area = pi * radx * rady,
+           layer = floor((cumsum(crown_area) - crown_area) / area))
+  la_by_layer <- ordered %>% group_by(layer) %>% summarise(la = sum(larea)) %>%
+    arrange(layer) %>% mutate(la_above = cumsum(la) - la)
+
+  ft <- ordered %>%
+    mutate(h = t_h, lai = cumsum(larea) / area, model = "FLAT TOP") %>%
+    filter(focal)
+  ppa <- ordered %>%
+    left_join(la_by_layer, by = "layer") %>%
+    mutate(h = t_h, lai = la_above / area, model = "PPA") %>%
+    filter(focal)
+  dc <- data %>%
+    mutate(t_h = httrunk + htcrown,
+           leaf_dist = purrr::pmap(list(httrunk, htcrown, radx, rady, larea),
+                                   deep_leaf_distribtuion)) %>%
+    select(-larea) %>%
+    unnest(leaf_dist) %>%
+    arrange(desc(h)) %>%
+    mutate(larea = larea_slice, lai = cumsum(larea_slice) / area, model = "DEEP CROWN") %>%
+    filter(focal)
+
+  bind_rows(ft, ppa, dc) %>%
+    select(model, tree_num, focal, t_h, h, larea, lai) %>%
+    mutate(area = area)
+}
+
+## LAI above the focal tree (or each Deep Crown slice) for every stand in a grid
+approx_lai_2026 <- function(folder, combos) {
+  combos %>%
+    mutate(path = sprintf("%s/H%s_V%s_L%s_F%s_fla%s_S%s", folder, H, V, L, F, fla, S),
+           lai_tab = map(path, ~ model_lai_2026(load_trees_2026(.x)))) %>%
+    select(-path) %>%
+    unnest(lai_tab)
+}
+
+## daily PAR integral above the canopy (MJ m-2 d-1) from met.dat
+daily_par <- function(met_file = "met.dat") {
+  met <- readmet(filename = met_file, nlines = -1) %>% as_tibble()
+  pracma::trapz(met$TIME, met$PAR * 3600 / 4.57 / 1e6)
+}
+
+## Absorbed PAR per unit leaf area at a given LAI above.
+## Two-component light model (stream = 2): a fraction w of the light attenuates
+## quickly (ka) and the rest slowly (kb); a = absorptance at the canopy top.
+## Single-component Beer's law (stream = 1): one extinction coefficient k.
+## Because the light profile depends only on LAI above, the daily integral
+## factorises into G (the day's incoming PAR) times the transmission.
+absorb <- function(lai, p, G, stream = 2) {
+  if (stream == 1) p[["a"]] * G * exp(-p[["k"]] * lai)
+  else p[["a"]] * G * (p[["w"]] * exp(-p[["ka"]] * lai) + (1 - p[["w"]]) * exp(-p[["kb"]] * lai))
+}
+
+## sum over Deep Crown slices (leaf-area weighted), then average replicates
+approx_par_2026 <- function(lai_tab, p, G, stream = 2) {
+  lai_tab %>%
+    mutate(par = absorb(lai, p, G, stream)) %>%
+    group_by(H, V, L, F, fla, S, model) %>%
+    summarise(par = sum(par * larea) / sum(larea), .groups = "drop") %>%
+    group_by(H, V, L, F, fla, model) %>%
+    summarise(absPAR = mean(par), .groups = "drop")
+}
+
+## Calibrate the light model against MAESPA using only focal trees at the two
+## extremes -- full light (height ratio 1.99) and deep shade (ratio 0.01), all
+## densities and CVs -- where the Flat Top and Deep Crown agree, so the fit does
+## not favour any approximation. a is set from full light; the transmission
+## parameters are then fitted by least squares to the deep-shade trees.
+calibrate_light <- function(lai_tab, maespa, G, stream = 2) {
+  ext <- filter(lai_tab, model == "FLAT TOP", F %in% c(0.01, 1.99))
+  a <- mean(filter(maespa, F == 1.99)$absPAR) / G
+  sse <- function(p) {
+    pr <- approx_par_2026(ext, p, G, stream) %>%
+      inner_join(maespa, by = c("H", "V", "L", "F", "fla"), suffix = c("", ".m"))
+    sum((pr$absPAR - pr$absPAR.m)^2)
+  }
+  if (stream == 1) {
+    k <- optimize(function(k) sse(c(a = a, k = k)), c(0.01, 5))$minimum
+    return(c(a = a, k = k))
+  }
+  q <- optim(c(0, log(2), log(0.5)), function(q)
+    sse(c(a = a, w = plogis(q[1]), ka = exp(q[2]), kb = exp(q[3]))))$par
+  c(a = a, w = plogis(q[1]), ka = exp(q[2]), kb = exp(q[3]))
+}

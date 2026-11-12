@@ -50,14 +50,20 @@ create_coordinates <- function(sn = sqrt_n) {
     as.matrix()
 }
 
+## NOTE (2026.11.13): plot_area previously defaulted to 12000 m², but create_coordinates()
+## spreads trees over 0-196 m in x and y (196^2 = 38,416 m²), so stands had ~0.3x the
+## intended LAI. The default now matches the geometry. For the 2026 rerun, stands are
+## specified by n_side (trees per row), giving a complete n_side x n_side grid with
+## spacing s = 196 / (n_side - 1) and realised LAI = indivlarea / s^2.
 create_trees <- function(path, h_mn = 10, h_cv = 0.1, LAI = 1.54, ft_h = 1.99, fla = 1,
-                         plot_area = 12000, indivlarea = 27, indivrad = 5.087809/2, 
-                         indivhtcrown = 6.359762, indivdiam = 0.3, seed = 1, half = 1/2) {
+                         plot_area = 196^2, indivlarea = 27, indivrad = 5.087809/2,
+                         indivhtcrown = 6.359762, indivdiam = 0.3, seed = 1, half = 1/2,
+                         n_side = NULL) {
   wd <- setwd(path)
   on.exit(setwd(wd))
   set.seed(seed)
   h_sd <- h_mn * h_cv
-  ntrees <- ceiling(plot_area*(LAI/indivlarea))
+  ntrees <- if (is.null(n_side)) ceiling(plot_area*(LAI/indivlarea)) else n_side^2
   sqrt_n <- ceiling(sqrt(ntrees))
   SD_height_df <- SD_height(n = ntrees, h_mn, h_sd, sn = sqrt_n) 
   coordinates <- create_coordinates(sqrt_n)
@@ -144,12 +150,17 @@ create_simulation_f_stand <- function(path = "simulations/Trail", template = "te
   create_trees_f_stand(path,...)
 }
 
-run_simulation <- function(path) {
+## MAESPA executable: set MAESPA_BIN to override. Stands with more than 1500 trees need
+## MAESPA compiled with MAXT >= the tree count (maestcom.f90); with the default MAXT = 1500
+## MAESPA silently drops trees beyond 1500 and regenerates the tree coordinates.
+run_simulation <- function(path, maespa = Sys.getenv("MAESPA_BIN")) {
   wd <- setwd(path)
   on.exit(setwd(wd))
-  n <- stringr::str_count(path,"/")
-  maespa <- paste0(c(rep("..", n+1), "src/maespa.out"), collapse = "/")
-  system(maespa)
+  if (!nzchar(maespa)) {
+    n <- stringr::str_count(path,"/")
+    maespa <- paste0(c(rep("..", n+1), "src/maespa.out"), collapse = "/")
+  }
+  system(paste(shQuote(maespa), "> maespa.log 2>&1"))
 }
 
 load_output <- function(path){
